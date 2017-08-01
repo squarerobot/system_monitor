@@ -16,7 +16,7 @@
       output="$(arg output)" respawn="true"/>      
   </group>
   
-  <node name= "monitor_node" pkg="system_monitor" type="system_monitor.py"
+  <node name= "monitor_node" pkg="system_monitor" type="system_monitor_node.py"
     output="screen"></node>
 
   <rosparam command="load" file="$(arg config_file)"

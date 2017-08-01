@@ -1,9 +1,5 @@
 string name
 # Possible values for message: 'OK', 'Warning','Error'
-string status
+string message
 string hardware_id
-float32 timeSinceUpdate
-#Memory space in M
-int32 totalM
-int32 usedM
-int32 freeM
+system_monitor/MEMStatus status

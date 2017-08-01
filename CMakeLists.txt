@@ -21,12 +21,21 @@ add_message_files(
    Disk.msg
    HDDStatus.msg
    Interface.msg
+   MEMStatus.msg
+   Memory.msg
 )
 
 generate_messages(
    DEPENDENCIES
    std_msgs  
-   #monitor # Or other packages containing msgs
+   system_monitor # Or other packages containing msgs
 )
 
-catkin_package()
+catkin_package(
+  CATKIN_DEPENDS rospy message_runtime
+)
+
+include_directories(
+# include
+  ${catkin_INCLUDE_DIRS}
+)

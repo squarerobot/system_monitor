@@ -2,7 +2,7 @@
 
 import rospy
 from diagnostic_msgs.msg import DiagnosticArray
-from monitor.msg import *
+from system_monitor.msg import *
 
 class Monitor():
 
@@ -17,6 +17,7 @@ class Monitor():
 
 	#Update network values
 	def updateNetValues(self, status):
+		#TODO: Modify current structure of message
 		self._diag_net.name = status.name
 		self._diag_net.message = status.message
 		self._diag_net.interface[:] = []
@@ -38,11 +39,23 @@ class Monitor():
 
 	#Update memory values
 	def updateMemValues(self, status):
-		self._diag_mem.status = status.values[2].value
-		self._diag_mem.timeSinceUpdate = float(status.values[1].value)
-		self._diag_mem.totalM = int(status.values[11].value[:-1])
-		self._diag_mem.usedM = int(status.values[12].value[:-1])
-		self._diag_mem.freeM = int(status.values[13].value[:-1])
+		self._diag_mem.name = status.name
+		self._diag_mem.message = status.message
+		mem_status = MEMStatus()
+		mem_status.time = float(status.values[1].value)
+		mem_status.totalM = int(status.values[-3].value[:-1])
+		mem_status.usedM = int(status.values[-2].value[:-1])
+		mem_status.freeM = int(status.values[-1].value[:-1])
+		names = ['Physical','Physical w/o','Swap']
+		for i in xrange(0, 3):
+			mem = Memory()
+			mem.name = names[i]
+			#TODO: check index
+			mem.total = int(status.values[3+3*i].value[:-1])
+			mem.used = int(status.values[4+3*i].value[:-1])
+			mem.free = int(status.values[5+3*i].value[:-1])
+			mem_status.memories.append(mem)
+		self._diag_mem.status = mem_status
 		self.publishInfo()
 
 	#Update cpu_temp values
