@@ -1,0 +1,10 @@
+string name
+string state
+float32 input
+float32 output
+int32 collisions
+int32 rxError
+int32 txError
+int32 mtu
+float32 received
+float32 transmitted
