@@ -61,6 +61,11 @@ cpu_load5_warn = 0.8
 cpu_temp_warn = 85.0
 cpu_temp_error = 90.0
 
+num_cores = subprocess.Popen('lscpu | grep "^CPU(s):"',
+                                stdout= subprocess.PIPE,
+                                stderr= subprocess.PIPE, shell=True )
+num_cores = int(num_cores.communicate()[0][-2])
+
 stat_dict = { 0: 'OK', 1: 'Warning', 2: 'Error' }
 
 def update_status_stale(stat, last_update_time):
@@ -104,7 +109,7 @@ class CPUMonitor():
         self._cpu_temp_warn = rospy.get_param('~cpu_temp_warn', cpu_temp_warn)
         self._cpu_temp_error = rospy.get_param('~cpu_temp_error', cpu_temp_error)
 
-        self._num_cores = rospy.get_param('~num_cores', 0)
+        self._num_cores = rospy.get_param('~num_cores', num_cores)
 
         self._temps_timer = None
         self._usage_timer = None
@@ -262,9 +267,9 @@ class CPUMonitor():
                 return DiagnosticStatus.ERROR, vals
 
             upvals = stdout.split()
-            load1 = float(upvals[-3].rstrip(','))/self._num_cores
-            load5 = float(upvals[-2].rstrip(','))/self._num_cores
-            load15 = float(upvals[-1])/self._num_cores
+            load1 = float(upvals[-3].rstrip(',').replace(',','.'))/self._num_cores
+            load5 = float(upvals[-2].rstrip(',').replace(',','.'))/self._num_cores
+            load15 = float(upvals[-1].replace(',','.'))/self._num_cores
 
             # Give warning if we go over load limit
             if load1 > self._cpu_load1_warn or load5 > self._cpu_load5_warn:
