@@ -6,28 +6,34 @@ from monitor.msg import *
 
 class Monitor():
 
-	def __init__(self):
-		self._pub = rospy.Publisher('/newDiagnostic', Diagnostic, queue_size=1)
+	def __init__(self, r):
+		self._pub = rospy.Publisher('/robotnikDiagnostic', Diagnostic, queue_size=1)
 		self._diag_net = DiagnosticNET()
 		self._diag_mem = DiagnosticMEM()
 		self._diag_cpu_temp = DiagnosticCPUTemperature()
 		self._diag_cpu_usa = DiagnosticCPUUsage()
 		self._diag_hdd = DiagnosticHDD()
-		self._rate = rospy.Rate(0.5)
+		self._rate = rospy.Rate(r)
 
 	#Update network values
 	def updateNetValues(self, status):
 		self._diag_net.name = status.name
 		self._diag_net.message = status.message
-		#TODO: Obtain both interfaces
-		inter = Interface()
-		inter.name = status.values[12].value
-		inter.state = status.values[13].value
-		inter.received = float(status.values[17].value)
-		inter.transmitted = float(status.values[18].value)
-		inter.mtu = int(status.values[16].value)
 		self._diag_net.interface[:] = []
-		self._diag_net.interface.append(inter)
+		ifaces = (len(status.values) - 2) / 10
+		for i in xrange(0, ifaces):
+			inter = Interface()
+			inter.name = status.values[2+10*i].value
+			inter.state = status.values[3+10*i].value
+			inter.input = float(status.values[4+10*i].value[:-6])
+			inter.output = float(status.values[5+10*i].value[:-6])
+			inter.mtu = int(status.values[6+10*i].value)
+			inter.received = float(status.values[7+10*i].value)
+			inter.transmitted = float(status.values[8+10*i].value)
+			inter.collisions = int(status.values[9+10*i].value)
+			inter.rxError = int(status.values[10+10*i].value)
+			inter.txError = int(status.values[11+10*i].value)
+			self._diag_net.interface.append(inter)
 		self.publishInfo()
 
 	#Update memory values
@@ -133,6 +139,6 @@ def callback(data):
 
 if __name__ == '__main__':
 	rospy.init_node('monitor_node')
-	mon = Monitor()
+	mon = Monitor(0.5)
 	rospy.Subscriber('/diagnostics', DiagnosticArray, callback)
 	rospy.spin()
