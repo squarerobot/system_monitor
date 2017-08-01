@@ -294,14 +294,12 @@ class CPUMonitor():
         mp_level = DiagnosticStatus.OK
 
         load_dict = { 0: 'OK', 1: 'High Load', 2: 'Error' }
-
         try:
             p = subprocess.Popen('mpstat -P ALL 1 1',
                                 stdout = subprocess.PIPE,
                                 stderr = subprocess.PIPE, shell = True)
             stdout, stderr = p.communicate()
             retcode = p.returncode
-
             if retcode != 0:
                 if not self._has_warned_mpstat:
                     rospy.logerr("mpstat failed to run for cpu_monitor. Return code %d.", retcode)
@@ -315,8 +313,8 @@ class CPUMonitor():
             # mpstat output changed between 8.06 and 8.1
             rows = stdout.split('\n')
             col_names = rows[2].split()
-            idle_col = -1 if (len(col_names) > 2 and col_names[-1] == '%idle') else -2
 
+            idle_col = -1 if (len(col_names) > 2 and col_names[-1] == '%idle') else -2
             num_cores = 0
             cores_loaded = 0
             for index, row in enumerate(stdout.split('\n')):
@@ -326,20 +324,19 @@ class CPUMonitor():
                 # Skip row containing 'all' data
                 if row.find('all') > -1:
                     continue
-
                 lst = row.split()
                 if len(lst) < 8:
                     continue
 
                 ## Ignore 'Average: ...' data
-                if lst[0].startswith('Average'):
-                    continue
+                if lst[0].startswith('Average') or lst[0].startswith('Media'):
+                    continue 
 
                 cpu_name = '%d' % (num_cores)
                 idle = lst[idle_col]
-                user = lst[3]
-                nice = lst[4]
-                system = lst[5]
+                user = lst[2].replace(",",".")
+                nice = lst[3].replace(",",".")
+                system = lst[4].replace(",",".")
 
                 core_level = 0
                 usage = (float(user)+float(nice))*1e-2
