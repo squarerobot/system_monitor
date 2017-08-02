@@ -17,7 +17,7 @@ class Monitor():
 		self._rate = rospy.Rate(r)
 
 	#Update network values
-	def updateNetValues(self, status):
+	def update_net_values(self, status):
 		self._diag_net.name = status.name
 		self._diag_net.message = status.message
 		self._diag_net.hardware_id = status.hardware_id
@@ -152,7 +152,7 @@ def callback(data):
 		mon.update_mem_values(data.status[0])
 	elif data.status[0].name.startswith('Network'):
 		#Extract useful data from network
-		mon.updateNetValues(data.status[0])
+		mon.update_net_values(data.status[0])
 	elif data.status[0].name.startswith('CPU Temperature'):
 		#Extract useful data from cpu
 		mon.update_cpu_temp_values(data.status[0])
