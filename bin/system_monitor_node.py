@@ -39,10 +39,10 @@ class Monitor():
 			inter.txError = int(status.values[11+10*i].value)
 			net_status.interfaces.append(inter)
 		self._diag_net.status = net_status
-		self.publishInfo()
+		self.publish_info()
 
 	#Update memory values
-	def updateMemValues(self, status):
+	def update_mem_values(self, status):
 		self._diag_mem.name = status.name
 		self._diag_mem.message = status.message
 		self._diag_mem.hardware_id = status.hardware_id
@@ -65,10 +65,10 @@ class Monitor():
 		mem.free = int(status.values[7].value[:-1])
 		mem_status.memories.append(mem)
 		self._diag_mem.status = mem_status
-		self.publishInfo()
+		self.publish_info()
 
 	#Update cpu_temp values
-	def updateCpuTempValues(self, status):
+	def update_cpu_temp_values(self, status):
 		self._diag_cpu_temp.name = status.name
 		self._diag_cpu_temp.message = status.message
 		self._diag_cpu_temp.hardware_id = status.hardware_id
@@ -81,10 +81,10 @@ class Monitor():
 			core.temp = float(status.values[i].value[:-4])
 			aux_temp.cores.append(core)
 		self._diag_cpu_temp.status = aux_temp
-		self.publishInfo()
+		self.publish_info()
 
 	#Update cpu_usage values
-	def updateCpuUsaValues(self, status):
+	def update_cpu_usa_values(self, status):
 		self._diag_cpu_usa.name = status.name
 		self._diag_cpu_usa.message = status.message
 		self._diag_cpu_usa.hardware_id = status.hardware_id
@@ -108,10 +108,10 @@ class Monitor():
 			core.idle = float(status.values[6 + num_cores + 5*i].value[:-1].replace(",","."))
 			aux_usa.cores.append(core)
 		self._diag_cpu_usa.status = aux_usa
-		self.publishInfo()
+		self.publish_info()
 
 	#Update hdd values
-	def updateHddValues(self, status):
+	def update_hdd_values(self, status):
 		self._diag_hdd.name = status.name
 		self._diag_hdd.message = status.message
 		self._diag_hdd.hardware_id = status.hardware_id
@@ -131,10 +131,10 @@ class Monitor():
 			disk.mount_point = status.values[8 + i * 6].value
 			aux_stat.disks.append(disk)
 		self._diag_hdd.status = aux_stat
-		self.publishInfo()
+		self.publish_info()
 
 	#Publish info
-	def publishInfo(self):
+	def publish_info(self):
 		msg = Diagnostic()
 		msg.diagNet = self._diag_net
 		msg.diagMem = self._diag_mem
@@ -149,17 +149,17 @@ class Monitor():
 def callback(data):
 	if data.status[0].name.startswith('Memory'):
 		#Extract useful data from memory
-		mon.updateMemValues(data.status[0])
+		mon.update_mem_values(data.status[0])
 	elif data.status[0].name.startswith('Network'):
 		#Extract useful data from network
 		mon.updateNetValues(data.status[0])
 	elif data.status[0].name.startswith('CPU Temperature'):
 		#Extract useful data from cpu
-		mon.updateCpuTempValues(data.status[0])
-		mon.updateCpuUsaValues(data.status[1])
+		mon.update_cpu_temp_values(data.status[0])
+		mon.update_cpu_usa_values(data.status[1])
 	elif data.status[0].name.startswith("HDD Usage"):
 		#Extract useful data from disk
-		mon.updateHddValues(data.status[0])
+		mon.update_hdd_values(data.status[0])
 
 
 if __name__ == '__main__':
