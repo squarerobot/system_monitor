@@ -21,8 +21,9 @@ add_message_files(
    Disk.msg
    HDDStatus.msg
    Interface.msg
-   MEMStatus.msg
    Memory.msg
+   MEMStatus.msg
+   NetStatus.msg
 )
 
 generate_messages(
