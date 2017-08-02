@@ -41,6 +41,7 @@ class Monitor():
 	def updateMemValues(self, status):
 		self._diag_mem.name = status.name
 		self._diag_mem.message = status.message
+		self._diag_mem.hardware_id = status.hardware_id
 		mem_status = MEMStatus()
 		mem_status.time = float(status.values[1].value)
 		mem_status.totalM = int(status.values[-3].value[:-1])
@@ -62,6 +63,7 @@ class Monitor():
 	def updateCpuTempValues(self, status):
 		self._diag_cpu_temp.name = status.name
 		self._diag_cpu_temp.message = status.message
+		self._diag_cpu_temp.hardware_id = status.hardware_id
 		aux_temp = CPUTemperatureStatus()
 		aux_temp.status = status.values[0].value
 		aux_temp.time = float(status.values[1].value)
@@ -77,6 +79,7 @@ class Monitor():
 	def updateCpuUsaValues(self, status):
 		self._diag_cpu_usa.name = status.name
 		self._diag_cpu_usa.message = status.message
+		self._diag_cpu_usa.hardware_id = status.hardware_id
 		aux_usa = CPUUsageStatus()
 		len_values = len(status.values)
 		num_cores = (len_values - 6)/6
@@ -103,6 +106,7 @@ class Monitor():
 	def updateHddValues(self, status):
 		self._diag_hdd.name = status.name
 		self._diag_hdd.message = status.message
+		self._diag_hdd.hardware_id = status.hardware_id
 		aux_stat = HDDStatus()
 		aux_stat.status = status.values[0].value
 		aux_stat.time = float(status.values[1].value)
