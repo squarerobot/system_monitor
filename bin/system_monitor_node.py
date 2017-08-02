@@ -6,18 +6,18 @@ from system_monitor.msg import *
 
 class Monitor():
 
-	def __init__(self, r):
+	def __init__(self):
 		self._pub = rospy.Publisher('/robotnikDiagnostic', Diagnostic, queue_size=1)
 		self._diag_net = DiagnosticNET()
 		self._diag_mem = DiagnosticMEM()
 		self._diag_cpu_temp = DiagnosticCPUTemperature()
 		self._diag_cpu_usa = DiagnosticCPUUsage()
 		self._diag_hdd = DiagnosticHDD()
+		r = rospy.get_param("rate_param", 0.5)
 		self._rate = rospy.Rate(r)
 
 	#Update network values
 	def updateNetValues(self, status):
-		#TODO: Modify current structure of message
 		self._diag_net.name = status.name
 		self._diag_net.message = status.message
 		self._diag_net.hardware_id = status.hardware_id
@@ -51,15 +51,19 @@ class Monitor():
 		mem_status.totalM = int(status.values[-3].value[:-1])
 		mem_status.usedM = int(status.values[-2].value[:-1])
 		mem_status.freeM = int(status.values[-1].value[:-1])
-		names = ['Physical','Physical w/o','Swap']
-		for i in xrange(0, 3):
+		names = ['Physical','Swap']
+		for i in xrange(0, 2):
 			mem = Memory()
 			mem.name = names[i]
-			#TODO: check index
-			mem.total = int(status.values[3+3*i].value[:-1])
-			mem.used = int(status.values[4+3*i].value[:-1])
-			mem.free = int(status.values[5+3*i].value[:-1])
+			mem.total = int(status.values[3+5*i].value[:-1])
+			mem.used = int(status.values[4+5*i].value[:-1])
+			mem.free = int(status.values[5+5*i].value[:-1])
 			mem_status.memories.append(mem)
+		mem = Memory()
+		mem.name = "Physical w/o buffers"
+		mem.used = int(status.values[6].value[:-1])
+		mem.free = int(status.values[7].value[:-1])
+		mem_status.memories.append(mem)
 		self._diag_mem.status = mem_status
 		self.publishInfo()
 
@@ -160,6 +164,6 @@ def callback(data):
 
 if __name__ == '__main__':
 	rospy.init_node('monitor_node')
-	mon = Monitor(0.5)
+	mon = Monitor()
 	rospy.Subscriber('/diagnostics', DiagnosticArray, callback)
 	rospy.spin()
