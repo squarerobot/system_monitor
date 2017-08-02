@@ -20,7 +20,10 @@ class Monitor():
 		#TODO: Modify current structure of message
 		self._diag_net.name = status.name
 		self._diag_net.message = status.message
-		self._diag_net.interface[:] = []
+		self._diag_net.hardware_id = status.hardware_id
+		net_status = NetStatus()
+		net_status.status = status.values[0].value
+		net_status.time = float(status.values[1].value)
 		ifaces = (len(status.values) - 2) / 10
 		for i in xrange(0, ifaces):
 			inter = Interface()
@@ -34,7 +37,8 @@ class Monitor():
 			inter.collisions = int(status.values[9+10*i].value)
 			inter.rxError = int(status.values[10+10*i].value)
 			inter.txError = int(status.values[11+10*i].value)
-			self._diag_net.interface.append(inter)
+			net_status.interfaces.append(inter)
+		self._diag_net.status = net_status
 		self.publishInfo()
 
 	#Update memory values
