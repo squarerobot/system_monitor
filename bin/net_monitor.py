@@ -132,7 +132,7 @@ class NetMonitor():
                            stderr = subprocess.PIPE, shell = True)
       stdout, stderr = p.communicate()
       retcode = p.returncode
-      if retcode != 0:
+      if retcode == 3:
         values.append(KeyValue(key = "\"ifstat -q -S 1 1\" Call Error",
           value = str(retcode)))
         return DiagnosticStatus.ERROR, net_dict[3], values
