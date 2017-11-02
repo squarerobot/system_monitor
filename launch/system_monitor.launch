@@ -16,7 +16,7 @@
       output="$(arg output)" respawn="true"/>      
   </group>
   
-  <node name= "monitor_node" pkg="system_monitor" type="system_monitor_node.py"
+  <node name= "system_monitor" pkg="system_monitor" type="system_monitor_node.py"
     output="screen">
     <param name="rate_param" type="double" value="0.5"/>  
   </node>
