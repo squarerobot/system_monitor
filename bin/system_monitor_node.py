@@ -7,7 +7,7 @@ from system_monitor.msg import *
 class Monitor():
 
 	def __init__(self):
-		self._pub = rospy.Publisher('/robotnikDiagnostic', Diagnostic, queue_size=1)
+		self._pub = rospy.Publisher('~diagnostics', Diagnostic, queue_size=1)
 		self._diag_net = DiagnosticNET()
 		self._diag_mem = DiagnosticMEM()
 		self._diag_cpu_temp = DiagnosticCPUTemperature()
@@ -163,7 +163,7 @@ def callback(data):
 
 
 if __name__ == '__main__':
-	rospy.init_node('monitor_node')
+	rospy.init_node('system_monitor_node')
 	mon = Monitor()
 	rospy.Subscriber('/diagnostics', DiagnosticArray, callback)
 	rospy.spin()
