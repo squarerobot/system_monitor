@@ -39,5 +39,5 @@ Download the repository in the src folder of your worksapce:
 Keep in mind that this package has some dependencies. If you do not have them, you will have to install them:
 
   ```
-  sudo add-apt install sysstat ifstat ntpdate
+  sudo apt-get install sysstat ifstat ntpdate
   ```
