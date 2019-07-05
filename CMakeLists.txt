@@ -40,3 +40,19 @@ include_directories(
 # include
   ${catkin_INCLUDE_DIRS}
 )
+
+install(PROGRAMS
+   bin/cpu_monitor.py
+   bin/hdd_monitor.py
+   bin/mem_monitor.py
+   bin/net_monitor.py
+   bin/ntp_monitor.py
+   bin/system_monitor_node.py
+   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+)
+
+
+install(
+  DIRECTORY bin config launch 
+  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
+)
