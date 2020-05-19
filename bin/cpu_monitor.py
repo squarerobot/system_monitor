@@ -242,7 +242,7 @@ class CPUMonitor():
 
             freq = psutil.cpu_freq(percpu=True)
             for index, core in enumerate(freq):
-                 speed = str(core.current)
+                speed = str(core.current)
                 vals.append(KeyValue(key = 'Core %d Clock Speed' % index, value = speed+"MHz"))
 
         except Exception, e:
