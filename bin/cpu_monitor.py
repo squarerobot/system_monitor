@@ -116,7 +116,7 @@ class CPUMonitor():
         self._usage_timer = None
 
         # Get temp_input files
-        self._temp_vals = self.get_core_temp_names()
+        # self._temp_vals = self.get_core_temp_names()
 
         # CPU stats
         self._temp_stat = DiagnosticStatus()
@@ -172,7 +172,7 @@ class CPUMonitor():
     ##
     ## Use 'find /sys -name temp1_input' to find cores
     ## Read from every core, divide by 1000
-    def check_core_temps(self, sys_temp_strings):
+    def check_core_temps(self):
         diag_vals = []
         diag_level = 0
         diag_msgs = []
@@ -416,26 +416,26 @@ class CPUMonitor():
 
     ## Returns names for core temperature files
     ## Returns list of names, each name can be read like file
-    def get_core_temp_names(self):
-        temp_vals = []
-        try:
-            p = subprocess.Popen('find /sys/devices -name temp1_input',
-                                stdout = subprocess.PIPE,
-                                stderr = subprocess.PIPE, shell = True)
-            stdout, stderr = p.communicate()
-            retcode = p.returncode
+    # def get_core_temp_names(self):
+    #     temp_vals = []
+    #     try:
+    #         p = subprocess.Popen('find /sys/devices -name temp1_input',
+    #                             stdout = subprocess.PIPE,
+    #                             stderr = subprocess.PIPE, shell = True)
+    #         stdout, stderr = p.communicate()
+    #         retcode = p.returncode
 
-            if retcode != 0:
-                rospy.logerr('Error find core temp locations: %s' % stderr)
-                return []
+    #         if retcode != 0:
+    #             rospy.logerr('Error find core temp locations: %s' % stderr)
+    #             return []
 
-            for ln in stdout.split('\n'):
-                temp_vals.append(ln.strip())
+    #         for ln in stdout.split('\n'):
+    #             temp_vals.append(ln.strip())
 
-            return temp_vals
-        except:
-            rospy.logerr('Exception finding temp vals: %s' % traceback.format_exc())
-            return []
+    #         return temp_vals
+    #     except:
+    #         rospy.logerr('Exception finding temp vals: %s' % traceback.format_exc())
+    #         return []
 
     ## Call every 10sec at minimum
     def check_temps(self):
@@ -450,7 +450,7 @@ class CPUMonitor():
         diag_level = 0
 
         if self._check_core_temps:
-            core_vals, core_msgs, core_level = self.check_core_temps(self._temp_vals)
+            core_vals, core_msgs, core_level = self.check_core_temps()
             diag_vals.extend(core_vals)
             diag_msgs.extend(core_msgs)
             diag_level = max(diag_level, core_level)
