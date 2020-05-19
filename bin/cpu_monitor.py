@@ -436,11 +436,11 @@ class CPUMonitor():
 
         with self._mutex:
             self._last_temp_time = rospy.get_time()
-            
+
             self._temp_stat.level = diag_level
             self._temp_stat.message = message
             self._temp_stat.values = diag_vals
-            
+
             if not rospy.is_shutdown():
                 self._temps_timer = threading.Timer(5.0, self.check_temps)
                 self._temps_timer.start()
@@ -451,7 +451,7 @@ class CPUMonitor():
         if rospy.is_shutdown():
             with self._mutex:
                 self.cancel_timers()
-            return 
+            return
 
         diag_level = 0
         diag_vals = [ KeyValue(key = 'Update Status', value = 'OK' ),
@@ -470,14 +470,14 @@ class CPUMonitor():
         if mp_level > 0:
             diag_msgs.append(mp_msg)
         diag_level = max(diag_level, mp_level)
-            
+
         # Check uptime
         uptime_level, up_msg, up_vals = self.check_uptime()
         diag_vals.extend(up_vals)
         if uptime_level > 0:
             diag_msgs.append(up_msg)
         diag_level = max(diag_level, uptime_level)
-        
+
         if diag_msgs and diag_level > 0:
             usage_msg = ', '.join(set(diag_msgs))
         else:
@@ -488,9 +488,9 @@ class CPUMonitor():
             self._last_usage_time = rospy.get_time()
             self._usage_stat.level = diag_level
             self._usage_stat.values = diag_vals
-            
+
             self._usage_stat.message = usage_msg
-            
+
             if not rospy.is_shutdown():
                 self._usage_timer = threading.Timer(5.0, self.check_usage)
                 self._usage_timer.start()
@@ -512,7 +512,7 @@ class CPUMonitor():
                 self._diag_pub.publish(msg)
                 self._last_publish_time = rospy.get_time()
 
-        
+
         # Restart temperature checking if it goes stale, #4171
         # Need to run this without mutex
         if rospy.get_time() - self._last_temp_time > 90: 
