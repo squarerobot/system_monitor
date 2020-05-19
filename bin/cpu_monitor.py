@@ -177,24 +177,39 @@ class CPUMonitor():
         diag_level = 0
         diag_msgs = []
 
-        for index, temp_str in enumerate(sys_temp_strings):
-            if len(temp_str) < 5:
+        already_read = []
+        core_temps = psutil.sensors_temperatures()['coretemp']
+        for core_temp in core_temps:
+            label = core_temp.label
+            tmp = core_temp.current
+            cpu_global_temp = False
+            if "Core " not in label:
+                cpu_global_temp = True
                 continue
+            label = label.split(" ")
+            index = int(label[1])
+            if index in already_read:
+                continue
+            already_read += [index]
 
-            cmd = 'cat %s' % temp_str
-            p = subprocess.Popen(cmd, stdout = subprocess.PIPE,
-                                stderr = subprocess.PIPE, shell = True)
-            stdout, stderr = p.communicate()
-            retcode = p.returncode
+        # for index, temp_str in enumerate(sys_temp_strings):
+        #     if len(temp_str) < 5:
+        #         continue
 
-            if retcode != 0:
-                diag_level = DiagnosticStatus.ERROR
-                diag_msg = [ 'Core Temperature Error' ]
-                diag_vals = [ KeyValue(key = 'Core Temperature Error', value = stderr),
-                              KeyValue(key = 'Output', value = stdout) ]
-                return diag_vals, diag_msgs, diag_level
+        #     cmd = 'cat %s' % temp_str
+        #     p = subprocess.Popen(cmd, stdout = subprocess.PIPE,
+        #                         stderr = subprocess.PIPE, shell = True)
+        #     stdout, stderr = p.communicate()
+        #     retcode = p.returncode
 
-            tmp = stdout.strip()
+        #     if retcode != 0:
+        #         diag_level = DiagnosticStatus.ERROR
+        #         diag_msg = [ 'Core Temperature Error' ]
+        #         diag_vals = [ KeyValue(key = 'Core Temperature Error', value = stderr),
+        #                       KeyValue(key = 'Output', value = stdout) ]
+        #         return diag_vals, diag_msgs, diag_level
+
+        #     tmp = stdout.strip()
             if unicode(tmp).isnumeric():
                 temp = float(tmp) / 1000
                 diag_vals.append(KeyValue(key = 'Core %d Temperature' % index, value = str(temp)+"DegC"))
@@ -207,7 +222,10 @@ class CPUMonitor():
                     diag_msgs.append('Hot')
             else:
                 diag_level = max(diag_level, DiagnosticStatus.ERROR) # Error if not numeric value
-                diag_vals.append(KeyValue(key = 'Core %s Temperature' % index, value = tmp))
+            if not cpu_global_temp:
+                diag_vals.append(KeyValue(key = 'Core %s Temperature' % index, value = str(tmp)))
+            else:
+            #     diag_vals.append(KeyValue(key = 'CPU Temperature' tmp))
 
         return diag_vals, diag_msgs, diag_level
 

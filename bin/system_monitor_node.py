@@ -78,7 +78,7 @@ class Monitor():
         for i in range(2, len(status.values)):
             core = CoreTemp()
             core.id = i - 2
-            core.temp = float(status.values[i].value[:-4])
+            core.temp = float(status.values[i].value)
             aux_temp.cores.append(core)
         self._diag_cpu_temp.status = aux_temp
         self.publish_info()
