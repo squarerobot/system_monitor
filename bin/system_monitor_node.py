@@ -75,9 +75,10 @@ class Monitor():
         aux_temp = CPUTemperatureStatus()
         aux_temp.status = status.values[0].value
         aux_temp.time = float(status.values[1].value)
-        for i in range(2, len(status.values)):
+        aux_temp.global_temp = float(status.values[2].value)
+        for i in range(3, len(status.values)):
             core = CoreTemp()
-            core.id = i - 2
+            core.id = i - 3
             core.temp = float(status.values[i].value)
             aux_temp.cores.append(core)
         self._diag_cpu_temp.status = aux_temp
