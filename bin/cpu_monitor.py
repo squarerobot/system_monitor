@@ -49,8 +49,9 @@ import sys, os, time
 from time import sleep
 import subprocess
 import string
-
 import socket
+import multiprocessing
+import psutil
 
 from diagnostic_msgs.msg import DiagnosticArray, DiagnosticStatus, KeyValue
 
@@ -61,10 +62,11 @@ cpu_load5_warn = 0.8
 cpu_temp_warn = 85.0
 cpu_temp_error = 90.0
 
-num_cores = subprocess.Popen('lscpu | grep "^CPU(s):"',
-                                stdout= subprocess.PIPE,
-                                stderr= subprocess.PIPE, shell=True )
-num_cores = int(num_cores.communicate()[0][-2])
+# num_cores = subprocess.Popen('lscpu | grep "^CPU(s):"',
+#                                 stdout= subprocess.PIPE,
+#                                 stderr= subprocess.PIPE, shell=True )
+# num_cores = int(num_cores.communicate()[0][-2])
+num_cores = int(multiprocessing.cpu_count())
 
 stat_dict = { 0: 'OK', 1: 'Warning', 2: 'Error' }
 
