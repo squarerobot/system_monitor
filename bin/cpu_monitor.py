@@ -50,7 +50,6 @@ from time import sleep
 import subprocess
 import string
 import socket
-import multiprocessing
 import psutil
 
 from diagnostic_msgs.msg import DiagnosticArray, DiagnosticStatus, KeyValue
@@ -66,7 +65,7 @@ cpu_temp_error = 90.0
 #                                 stdout= subprocess.PIPE,
 #                                 stderr= subprocess.PIPE, shell=True )
 # num_cores = int(num_cores.communicate()[0][-2])
-num_cores = int(multiprocessing.cpu_count())
+num_cores = int(psutil.cpu_count(logical=True))
 
 stat_dict = { 0: 'OK', 1: 'Warning', 2: 'Error' }
 
