@@ -61,10 +61,6 @@ cpu_load5_warn = 0.8
 cpu_temp_warn = 85.0
 cpu_temp_error = 90.0
 
-# num_cores = subprocess.Popen('lscpu | grep "^CPU(s):"',
-#                                 stdout= subprocess.PIPE,
-#                                 stderr= subprocess.PIPE, shell=True )
-# num_cores = int(num_cores.communicate()[0][-2])
 num_cores = int(psutil.cpu_count(logical=True))
 
 stat_dict = { 0: 'OK', 1: 'Warning', 2: 'Error' }
@@ -114,9 +110,6 @@ class CPUMonitor():
 
         self._temps_timer = None
         self._usage_timer = None
-
-        # Get temp_input files
-        # self._temp_vals = self.get_core_temp_names()
 
         # CPU stats
         self._temp_stat = DiagnosticStatus()
@@ -193,24 +186,6 @@ class CPUMonitor():
                 continue
             already_read += [index]
 
-        # for index, temp_str in enumerate(sys_temp_strings):
-        #     if len(temp_str) < 5:
-        #         continue
-
-        #     cmd = 'cat %s' % temp_str
-        #     p = subprocess.Popen(cmd, stdout = subprocess.PIPE,
-        #                         stderr = subprocess.PIPE, shell = True)
-        #     stdout, stderr = p.communicate()
-        #     retcode = p.returncode
-
-        #     if retcode != 0:
-        #         diag_level = DiagnosticStatus.ERROR
-        #         diag_msg = [ 'Core Temperature Error' ]
-        #         diag_vals = [ KeyValue(key = 'Core Temperature Error', value = stderr),
-        #                       KeyValue(key = 'Output', value = stdout) ]
-        #         return diag_vals, diag_msgs, diag_level
-
-        #     tmp = stdout.strip()
             if isinstance(tmp, float):
                 if tmp >= self._cpu_temp_warn:
                     diag_level = max(diag_level, DiagnosticStatus.WARN)
@@ -240,27 +215,6 @@ class CPUMonitor():
         lvl = DiagnosticStatus.OK
 
         try:
-            # p = subprocess.Popen('cat /proc/cpuinfo | grep MHz',
-            #                     stdout = subprocess.PIPE,
-            #                     stderr = subprocess.PIPE, shell = True)
-            # stdout, stderr = p.communicate()
-            # retcode = p.returncode
-            # if retcode != 0:
-            #     lvl = DiagnosticStatus.ERROR
-            #     msgs = [ 'Clock speed error' ]
-            #     vals = [ KeyValue(key = 'Clock speed error', value = stderr),
-            #             KeyValue(key = 'Output', value = stdout) ]
-
-            #     return (vals, msgs, lvl)
-
-            # for index, ln in enumerate(stdout.split('\n')):
-            #     words = ln.split(':')
-            #     if len(words) < 2:
-            #         continue
-
-            #     speed = words[1].strip().split('.')[0] # Conversion to float doesn't work with decimal
-            #     vals.append(KeyValue(key = 'Core %d Clock Speed' % index, value = speed+"MHz"))
-
             freq = psutil.cpu_freq(percpu=True)
             for index, core in enumerate(freq):
                 speed = str(core.current)
@@ -285,15 +239,6 @@ class CPUMonitor():
 
         try:
             avg=psutil.getloadavg()
-            # p = subprocess.Popen('uptime', stdout = subprocess.PIPE,
-            #                     stderr = subprocess.PIPE, shell = True)
-            # stdout, stderr = p.communicate()
-            # retcode = p.returncode
-
-            # if retcode != 0:
-            #     vals.append(KeyValue(key = 'uptime Failed', value = stderr))
-            #     return DiagnosticStatus.ERROR, vals
-
             load1 = avg[0]
             load5 = avg[1]
             load15 = avg[2]
@@ -322,44 +267,10 @@ class CPUMonitor():
 
         load_dict = { 0: 'OK', 1: 'High Load', 2: 'Error' }
         try:
-            # p = subprocess.Popen('mpstat -P ALL 1 1',
-            #                     stdout = subprocess.PIPE,
-            #                     stderr = subprocess.PIPE, shell = True)
-            # stdout, stderr = p.communicate()
-            # retcode = p.returncode
-            # if retcode != 0:
-            #     if not self._has_warned_mpstat:
-            #         rospy.logerr("mpstat failed to run for cpu_monitor. Return code %d.", retcode)
-            #         self._has_warned_mpstat = True
-
-            #     mp_level = DiagnosticStatus.ERROR
-            #     vals.append(KeyValue(key = '\"mpstat\" Call Error', value = str(retcode)))
-            #     return mp_level, 'Unable to Check CPU Usage', vals
-
-            # # Check which column '%idle' is, #4539
-            # # mpstat output changed between 8.06 and 8.1
-            # rows = stdout.split('\n')
-            # col_names = rows[2].split()
-
-            # idle_col = -1 if (len(col_names) > 2 and col_names[-1] == '%idle') else -2
             num_cores = 0
             cores_loaded = 0
             cores_percent = psutil.cpu_times_percent(percpu=True)
             for index, core_percent in enumerate(cores_percent):
-            # for index, row in enumerate(stdout.split('\n')):
-                # if index < 3:
-                #     continue
-
-                # # Skip row containing 'all' data
-                # if row.find('all') > -1:
-                #     continue
-                # lst = row.split()
-                # if len(lst) < 8:
-                #     continue
-
-                # ## Ignore 'Average: ...' data
-                # if lst[0].startswith('Average') or lst[0].startswith('Media'):
-                #     continue
 
                 cpu_name = index
                 idle = core_percent.idle
@@ -413,29 +324,6 @@ class CPUMonitor():
             vals.append(KeyValue(key = 'mpstat Exception', value = str(e)))
 
         return mp_level, load_dict[mp_level], vals
-
-    ## Returns names for core temperature files
-    ## Returns list of names, each name can be read like file
-    # def get_core_temp_names(self):
-    #     temp_vals = []
-    #     try:
-    #         p = subprocess.Popen('find /sys/devices -name temp1_input',
-    #                             stdout = subprocess.PIPE,
-    #                             stderr = subprocess.PIPE, shell = True)
-    #         stdout, stderr = p.communicate()
-    #         retcode = p.returncode
-
-    #         if retcode != 0:
-    #             rospy.logerr('Error find core temp locations: %s' % stderr)
-    #             return []
-
-    #         for ln in stdout.split('\n'):
-    #             temp_vals.append(ln.strip())
-
-    #         return temp_vals
-    #     except:
-    #         rospy.logerr('Exception finding temp vals: %s' % traceback.format_exc())
-    #         return []
 
     ## Call every 10sec at minimum
     def check_temps(self):
