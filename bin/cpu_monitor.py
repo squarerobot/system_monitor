@@ -182,12 +182,13 @@ class CPUMonitor():
         for core_temp in core_temps:
             label = core_temp.label
             tmp = core_temp.current
-            cpu_global_temp = False
-            if "Core " not in label:
+            if "Core " in label:
+                cpu_global_temp = False
+                label = label.split(" ")
+                index = int(label[1])
+            else:
                 cpu_global_temp = True
-                continue
-            label = label.split(" ")
-            index = int(label[1])
+                index = "global"
             if index in already_read:
                 continue
             already_read += [index]
@@ -220,9 +221,15 @@ class CPUMonitor():
             else:
                 diag_level = max(diag_level, DiagnosticStatus.ERROR) # Error if not numeric value
             if not cpu_global_temp:
-                diag_vals.append(KeyValue(key = 'Core %s Temperature' % index, value = str(tmp)))
-            # else:
-            #     diag_vals.append(KeyValue(key = 'CPU Temperature' tmp))
+                diag_vals.append(KeyValue(
+                    key = 'Core %s Temperature' % index,
+                    value = str(tmp)
+                ))
+            else:
+                diag_vals.append(KeyValue(
+                    key = 'CPU Temperature',
+                    value = str(tmp)
+                ))
 
         return diag_vals, diag_msgs, diag_level
 
