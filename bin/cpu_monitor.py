@@ -219,26 +219,30 @@ class CPUMonitor():
         lvl = DiagnosticStatus.OK
 
         try:
-            p = subprocess.Popen('cat /proc/cpuinfo | grep MHz',
-                                stdout = subprocess.PIPE,
-                                stderr = subprocess.PIPE, shell = True)
-            stdout, stderr = p.communicate()
-            retcode = p.returncode
+            # p = subprocess.Popen('cat /proc/cpuinfo | grep MHz',
+            #                     stdout = subprocess.PIPE,
+            #                     stderr = subprocess.PIPE, shell = True)
+            # stdout, stderr = p.communicate()
+            # retcode = p.returncode
+            # if retcode != 0:
+            #     lvl = DiagnosticStatus.ERROR
+            #     msgs = [ 'Clock speed error' ]
+            #     vals = [ KeyValue(key = 'Clock speed error', value = stderr),
+            #             KeyValue(key = 'Output', value = stdout) ]
 
-            if retcode != 0:
-                lvl = DiagnosticStatus.ERROR
-                msgs = [ 'Clock speed error' ]
-                vals = [ KeyValue(key = 'Clock speed error', value = stderr),
-                        KeyValue(key = 'Output', value = stdout) ]
+            #     return (vals, msgs, lvl)
 
-                return (vals, msgs, lvl)
+            # for index, ln in enumerate(stdout.split('\n')):
+            #     words = ln.split(':')
+            #     if len(words) < 2:
+            #         continue
 
-            for index, ln in enumerate(stdout.split('\n')):
-                words = ln.split(':')
-                if len(words) < 2:
-                    continue
+            #     speed = words[1].strip().split('.')[0] # Conversion to float doesn't work with decimal
+            #     vals.append(KeyValue(key = 'Core %d Clock Speed' % index, value = speed+"MHz"))
 
-                speed = words[1].strip().split('.')[0] # Conversion to float doesn't work with decimal
+            freq = psutil.cpu_freq(percpu=True)
+            for index, core in enumerate(freq):
+                 speed = str(core.current)
                 vals.append(KeyValue(key = 'Core %d Clock Speed' % index, value = speed+"MHz"))
 
         except Exception, e:
