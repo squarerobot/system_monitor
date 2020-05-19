@@ -284,28 +284,28 @@ class CPUMonitor():
         load_dict = { 0: 'OK', 1: 'High Load', 2: 'Very High Load' }
 
         try:
-            p = subprocess.Popen('uptime', stdout = subprocess.PIPE,
-                                stderr = subprocess.PIPE, shell = True)
-            stdout, stderr = p.communicate()
-            retcode = p.returncode
+            avg=psutil.getloadavg()
+            # p = subprocess.Popen('uptime', stdout = subprocess.PIPE,
+            #                     stderr = subprocess.PIPE, shell = True)
+            # stdout, stderr = p.communicate()
+            # retcode = p.returncode
 
-            if retcode != 0:
-                vals.append(KeyValue(key = 'uptime Failed', value = stderr))
-                return DiagnosticStatus.ERROR, vals
+            # if retcode != 0:
+            #     vals.append(KeyValue(key = 'uptime Failed', value = stderr))
+            #     return DiagnosticStatus.ERROR, vals
 
-            upvals = stdout.split()
-            load1 = float(upvals[-3].rstrip(',').replace(',','.'))/self._num_cores
-            load5 = float(upvals[-2].rstrip(',').replace(',','.'))/self._num_cores
-            load15 = float(upvals[-1].replace(',','.'))/self._num_cores
+            load1 = avg[0]
+            load5 = avg[1]
+            load15 = avg[2]
 
             # Give warning if we go over load limit
             if load1 > self._cpu_load1_warn or load5 > self._cpu_load5_warn:
                 level = DiagnosticStatus.WARN
 
             vals.append(KeyValue(key = 'Load Average Status', value = load_dict[level]))
-            vals.append(KeyValue(key = 'Load Average (1min)', value = str(load1*1e2)+"%"))
-            vals.append(KeyValue(key = 'Load Average (5min)', value = str(load5*1e2)+"%"))
-            vals.append(KeyValue(key = 'Load Average (15min)', value = str(load15*1e2)+"%"))
+            vals.append(KeyValue(key = 'Load Average (1min)', value = str(load1)+"%"))
+            vals.append(KeyValue(key = 'Load Average (5min)', value = str(load5)+"%"))
+            vals.append(KeyValue(key = 'Load Average (15min)', value = str(load15)+"%"))
 
         except Exception, e:
             rospy.logerr(traceback.format_exc())
