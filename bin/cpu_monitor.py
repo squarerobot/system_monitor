@@ -300,51 +300,57 @@ class CPUMonitor():
 
         load_dict = { 0: 'OK', 1: 'High Load', 2: 'Error' }
         try:
-            p = subprocess.Popen('mpstat -P ALL 1 1',
-                                stdout = subprocess.PIPE,
-                                stderr = subprocess.PIPE, shell = True)
-            stdout, stderr = p.communicate()
-            retcode = p.returncode
-            if retcode != 0:
-                if not self._has_warned_mpstat:
-                    rospy.logerr("mpstat failed to run for cpu_monitor. Return code %d.", retcode)
-                    self._has_warned_mpstat = True
+            # p = subprocess.Popen('mpstat -P ALL 1 1',
+            #                     stdout = subprocess.PIPE,
+            #                     stderr = subprocess.PIPE, shell = True)
+            # stdout, stderr = p.communicate()
+            # retcode = p.returncode
+            # if retcode != 0:
+            #     if not self._has_warned_mpstat:
+            #         rospy.logerr("mpstat failed to run for cpu_monitor. Return code %d.", retcode)
+            #         self._has_warned_mpstat = True
 
-                mp_level = DiagnosticStatus.ERROR
-                vals.append(KeyValue(key = '\"mpstat\" Call Error', value = str(retcode)))
-                return mp_level, 'Unable to Check CPU Usage', vals
+            #     mp_level = DiagnosticStatus.ERROR
+            #     vals.append(KeyValue(key = '\"mpstat\" Call Error', value = str(retcode)))
+            #     return mp_level, 'Unable to Check CPU Usage', vals
 
-            # Check which column '%idle' is, #4539
-            # mpstat output changed between 8.06 and 8.1
-            rows = stdout.split('\n')
-            col_names = rows[2].split()
+            # # Check which column '%idle' is, #4539
+            # # mpstat output changed between 8.06 and 8.1
+            # rows = stdout.split('\n')
+            # col_names = rows[2].split()
 
-            idle_col = -1 if (len(col_names) > 2 and col_names[-1] == '%idle') else -2
+            # idle_col = -1 if (len(col_names) > 2 and col_names[-1] == '%idle') else -2
             num_cores = 0
             cores_loaded = 0
-            for index, row in enumerate(stdout.split('\n')):
-                if index < 3:
-                    continue
+            cores_percent = psutil.cpu_times_percent(percpu=True)
+            for index, core_percent in enumerate(cores_percent):
+            # for index, row in enumerate(stdout.split('\n')):
+                # if index < 3:
+                #     continue
 
-                # Skip row containing 'all' data
-                if row.find('all') > -1:
-                    continue
-                lst = row.split()
-                if len(lst) < 8:
-                    continue
+                # # Skip row containing 'all' data
+                # if row.find('all') > -1:
+                #     continue
+                # lst = row.split()
+                # if len(lst) < 8:
+                #     continue
 
-                ## Ignore 'Average: ...' data
-                if lst[0].startswith('Average') or lst[0].startswith('Media'):
-                    continue
+                # ## Ignore 'Average: ...' data
+                # if lst[0].startswith('Average') or lst[0].startswith('Media'):
+                #     continue
 
-                cpu_name = '%d' % (num_cores)
-                idle = lst[idle_col]
-                user = lst[2].replace(",",".")
-                nice = lst[3].replace(",",".")
-                system = lst[4].replace(",",".")
+                cpu_name = index
+                idle = core_percent.idle
+                idle += core_percent.iowait
+                user = core_percent.user
+                nice = core_percent.nice
+                system = core_percent.system
+                system += core_percent.irq
+                system += core_percent.softirq
+                system += core_percent.steal
 
                 core_level = 0
-                usage = (float(user)+float(nice))*1e-2
+                usage = (user+nice)*1e-2
                 if usage > 10.0: # wrong reading, use old reading instead
                     rospy.logwarn('Read CPU usage of %f percent. Reverting to previous reading of %f percent'%(usage, self._usage_old))
                     usage = self._usage_old
@@ -357,10 +363,10 @@ class CPUMonitor():
                     core_level = DiagnosticStatus.ERROR
 
                 vals.append(KeyValue(key = 'Core %s Status' % cpu_name, value = load_dict[core_level]))
-                vals.append(KeyValue(key = 'Core %s User' % cpu_name, value = user+"%"))
-                vals.append(KeyValue(key = 'Core %s Nice' % cpu_name, value = nice+"%"))
-                vals.append(KeyValue(key = 'Core %s System' % cpu_name, value = system+"%"))
-                vals.append(KeyValue(key = 'Core %s Idle' % cpu_name, value = idle+"%"))
+                vals.append(KeyValue(key = 'Core %s User' % cpu_name, value = str(user)+"%"))
+                vals.append(KeyValue(key = 'Core %s Nice' % cpu_name, value = str(nice)+"%"))
+                vals.append(KeyValue(key = 'Core %s System' % cpu_name, value = str(system)+"%"))
+                vals.append(KeyValue(key = 'Core %s Idle' % cpu_name, value = str(idle)+"%"))
 
                 num_cores += 1
 
