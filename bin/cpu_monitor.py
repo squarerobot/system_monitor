@@ -114,7 +114,7 @@ class CPUMonitor():
 
         self._temps_timer = None
         self._usage_timer = None
-        
+
         # Get temp_input files
         self._temp_vals = self.get_core_temp_names()
 
@@ -147,18 +147,18 @@ class CPUMonitor():
         self.check_temps()
         self.check_usage()
 
-    # Restart temperature checking 
+    # Restart temperature checking
     def _restart_temp_check(self):
         rospy.logerr('Restarting temperature check thread in cpu_monitor. This should not happen')
         try:
             with self._mutex:
                 if self._temps_timer:
                     self._temps_timer.cancel()
-                
+
             self.check_temps()
         except Exception, e:
             rospy.logerr('Unable to restart temp thread. Error: %s' % traceback.format_exc())
-            
+
 
     ## Must have the lock to cancel everything
     def cancel_timers(self):
@@ -335,7 +335,7 @@ class CPUMonitor():
 
                 ## Ignore 'Average: ...' data
                 if lst[0].startswith('Average') or lst[0].startswith('Media'):
-                    continue 
+                    continue
 
                 cpu_name = '%d' % (num_cores)
                 idle = lst[idle_col]
@@ -514,7 +514,7 @@ class CPUMonitor():
 
         # Restart temperature checking if it goes stale, #4171
         # Need to run this without mutex
-        if rospy.get_time() - self._last_temp_time > 90: 
+        if rospy.get_time() - self._last_temp_time > 90:
             self._restart_temp_check()
 
 
