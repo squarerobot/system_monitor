@@ -90,24 +90,97 @@ class Monitor():
         self._diag_cpu_usa.message = status.message
         self._diag_cpu_usa.hardware_id = status.hardware_id
         aux_usa = CPUUsageStatus()
-        len_values = len(status.values)
-        num_cores = (len_values - 6)/6
-        aux_usa.status = status.values[0].value
-        aux_usa.time = float(status.values[1].value)
-        aux_usa.load_status = status.values[len_values - 4].value
-        aux_usa.load_avg1 = float(status.values[len_values - 3].value[:-1])
-        aux_usa.load_avg5 = float(status.values[len_values - 2].value[:-1])
-        aux_usa.load_avg15 = float(status.values[len_values - 1].value[:-1])
-        for i in range(0, num_cores):
+        for item in status.values:
+            key = item.key
+            value = item.value
+            if key == 'Update Status':
+                aux_usa.status = value
+            if key == 'Time Since Last Update':
+                aux_usa.time = float(value)
+            if key == 'Logical Core Number':
+                aux_usa.logical_cores = int(value)
+            if key == 'Load Average Status':
+                aux_usa.load_status = value
+            if key == 'Load Average (1min)':
+                value = value.split('%')
+                aux_usa.load_avg1 = float(value[0])
+            if key == 'Load Average (5min)':
+                value = value.split('%')
+                aux_usa.load_avg5 = float(value[0])
+            if key == 'Load Average (15min)':
+                value = value.split('%')
+                aux_usa.load_avg15 = float(value[0])
+            if key == 'Load Now':
+                value = value.split('%')
+                aux_usa.load_now = float(value[0])
+
+        usa_freq_core_labels = []
+        usa_stat_core_labels = []
+        usa_user_core_labels = []
+        usa_nice_core_labels = []
+        usa_idle_core_labels = []
+        usa_sys_core_labels = []
+        for i in range(0, aux_usa.logical_cores):
+            core_freq_str = 'Core '
+            core_freq_str += str(i)
+            core_freq_str += ' Clock Speed'
+            usa_freq_core_labels.append(core_freq_str)
+            core_stat_str = 'Core '
+            core_stat_str += str(i)
+            core_stat_str += ' Status'
+            usa_stat_core_labels.append(core_stat_str)
+            core_user_str = 'Core '
+            core_user_str += str(i)
+            core_user_str += ' User'
+            usa_user_core_labels.append(core_user_str)
+            core_nice_str = 'Core '
+            core_nice_str += str(i)
+            core_nice_str += ' Nice'
+            usa_nice_core_labels.append(core_nice_str)
+            core_sys_str = 'Core '
+            core_sys_str += str(i)
+            core_sys_str += ' System'
+            usa_sys_core_labels.append(core_sys_str)
+            core_idle_str = 'Core '
+            core_idle_str += str(i)
+            core_idle_str += ' Idle'
+            usa_idle_core_labels.append(core_idle_str)
             core = CoreUsage()
-            core.id = i
-            core.speed = float(status.values[i +2].value[:-3])
-            core.status = status.values[2 + num_cores + 5*i].value
-            core.system = float(status.values[3 + num_cores + 5*i].value[:-1])
-            core.user = float(status.values[4 + num_cores + 5*i].value[:-1])
-            core.nice = float(status.values[5 + num_cores + 5*i].value[:-1])
-            core.idle = float(status.values[6 + num_cores + 5*i].value[:-1].replace(",","."))
             aux_usa.cores.append(core)
+
+        current_core = 0
+        for item in status.values:
+            key = item.key
+            value = item.value
+            if key == usa_freq_core_labels[current_core]:
+                aux_usa.cores[current_core].id = current_core
+                value = value.split('MHz')
+                aux_usa.cores[current_core].speed = float(value[0])
+                current_core += 1
+                if current_core >= aux_usa.logical_cores:
+                    break
+
+        current_core = 0
+        for item in status.values:
+            key = item.key
+            value = item.value
+            if key == usa_stat_core_labels[current_core]:
+                aux_usa.cores[current_core].status = value
+            if key == usa_user_core_labels[current_core]:
+                value = value.split('%')
+                aux_usa.cores[current_core].user = float(value[0])
+            if key == usa_nice_core_labels[current_core]:
+                value = value.split('%')
+                aux_usa.cores[current_core].nice = float(value[0])
+            if key == usa_sys_core_labels[current_core]:
+                value = value.split('%')
+                aux_usa.cores[current_core].system = float(value[0])
+            if key == usa_idle_core_labels[current_core]:
+                value = value.split('%')
+                aux_usa.cores[current_core].idle = float(value[0])
+                current_core += 1
+                if current_core >= aux_usa.logical_cores:
+                    break
         self._diag_cpu_usa.status = aux_usa
         self.publish_info()
 

@@ -62,6 +62,8 @@ cpu_temp_warn = 85.0
 cpu_temp_error = 90.0
 
 num_cores = int(psutil.cpu_count(logical=True))
+num_threads = int(psutil.cpu_count(logical=True))
+num_physic_cores = int(psutil.cpu_count(logical=False))
 
 stat_dict = { 0: 'OK', 1: 'Warning', 2: 'Error' }
 
@@ -117,16 +119,21 @@ class CPUMonitor():
         self._temp_stat.level = 1
         self._temp_stat.hardware_id = hostname
         self._temp_stat.message = 'No Data'
-        self._temp_stat.values = [ KeyValue(key = 'Update Status', value = 'No Data' ),
-                                   KeyValue(key = 'Time Since Last Update', value = 'N/A') ]
+        self._temp_stat.values = [
+            KeyValue(key = 'Update Status', value = 'No Data' ),
+            KeyValue(key = 'Time Since Last Update', value = 'N/A'),
+            KeyValue(key = 'Physical Core Number', value = str(num_physic_cores) ),
+        ]
 
         self._usage_stat = DiagnosticStatus()
         self._usage_stat.name = 'CPU Usage (%s)' % diag_hostname
         self._usage_stat.level = 1
         self._usage_stat.hardware_id = hostname
         self._usage_stat.message = 'No Data'
-        self._usage_stat.values = [ KeyValue(key = 'Update Status', value = 'No Data' ),
-                                    KeyValue(key = 'Time Since Last Update', value = 'N/A') ]
+        self._usage_stat.values = [
+            KeyValue(key = 'Update Status', value = 'No Data' ),
+            KeyValue(key = 'Time Since Last Update', value = 'N/A'),
+        ]
 
         self._last_temp_time = 0
         self._last_usage_time = 0
@@ -238,6 +245,7 @@ class CPUMonitor():
         load_dict = { 0: 'OK', 1: 'High Load', 2: 'Very High Load' }
 
         try:
+            load_now=psutil.cpu_percent(interval=1.0)
             avg=psutil.getloadavg()
             load1 = avg[0]
             load5 = avg[1]
@@ -251,6 +259,7 @@ class CPUMonitor():
             vals.append(KeyValue(key = 'Load Average (1min)', value = str(load1)+"%"))
             vals.append(KeyValue(key = 'Load Average (5min)', value = str(load5)+"%"))
             vals.append(KeyValue(key = 'Load Average (15min)', value = str(load15)+"%"))
+            vals.append(KeyValue(key = 'Load Now', value = str(load_now)+"%"))
 
         except Exception, e:
             rospy.logerr(traceback.format_exc())
@@ -369,9 +378,19 @@ class CPUMonitor():
             return
 
         diag_level = 0
-        diag_vals = [ KeyValue(key = 'Update Status', value = 'OK' ),
-                      KeyValue(key = 'Time Since Last Update', value = 0 )]
+        diag_vals = [
+            KeyValue(key = 'Update Status', value = 'OK' ),
+            KeyValue(key = 'Time Since Last Update', value = 0 ),
+            KeyValue(key = 'Logical Core Number', value = str(num_threads) ),
+        ]
         diag_msgs = []
+
+        # Check uptime
+        uptime_level, up_msg, up_vals = self.check_uptime()
+        diag_vals.extend(up_vals)
+        if uptime_level > 0:
+            diag_msgs.append(up_msg)
+        diag_level = max(diag_level, uptime_level)
 
         # Check clock speed
         clock_vals, clock_msgs, clock_level = self.check_clock_speed()
@@ -385,13 +404,6 @@ class CPUMonitor():
         if mp_level > 0:
             diag_msgs.append(mp_msg)
         diag_level = max(diag_level, mp_level)
-
-        # Check uptime
-        uptime_level, up_msg, up_vals = self.check_uptime()
-        diag_vals.extend(up_vals)
-        if uptime_level > 0:
-            diag_msgs.append(up_msg)
-        diag_level = max(diag_level, uptime_level)
 
         if diag_msgs and diag_level > 0:
             usage_msg = ', '.join(set(diag_msgs))
