@@ -245,15 +245,21 @@ class CPUMonitor():
         load_dict = { 0: 'OK', 1: 'High Load', 2: 'Very High Load' }
 
         try:
-            load_now=psutil.cpu_percent(interval=1.0)
-            avg=psutil.getloadavg()
-            load1 = avg[0]
-            load5 = avg[1]
-            load15 = avg[2]
+            load_now = psutil.cpu_percent(interval=0.15)
+            avg = psutil.getloadavg()
+            load1 = avg[0]/num_threads
+            load5 = avg[1]/num_threads
+            load15 = avg[2]/num_threads
 
             # Give warning if we go over load limit
             if load1 > self._cpu_load1_warn or load5 > self._cpu_load5_warn:
                 level = DiagnosticStatus.WARN
+
+            load_now = round(load_now, 2)
+            load1 = round(load1*100, 2)
+            load5 = round(load5*100, 2)
+            load15 = round(load15*100, 2)
+
 
             vals.append(KeyValue(key = 'Load Average Status', value = load_dict[level]))
             vals.append(KeyValue(key = 'Load Average (1min)', value = str(load1)+"%"))
