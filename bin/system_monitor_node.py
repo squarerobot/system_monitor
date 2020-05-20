@@ -113,6 +113,9 @@ class Monitor():
             if key == 'Load Now':
                 value = value.split('%')
                 aux_usa.load_now = float(value[0])
+            if key == 'CPU Clock Speed':
+                value = value.split('MHz')
+                aux_usa.speed = float(value[0])
 
         usa_freq_core_labels = []
         usa_stat_core_labels = []

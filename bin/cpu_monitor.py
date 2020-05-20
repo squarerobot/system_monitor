@@ -222,6 +222,9 @@ class CPUMonitor():
         lvl = DiagnosticStatus.OK
 
         try:
+            freq = psutil.cpu_freq(percpu=False)
+            speed=str(freq.current)
+            vals.append(KeyValue(key = 'CPU Clock Speed', value = speed+"MHz"))
             freq = psutil.cpu_freq(percpu=True)
             for index, core in enumerate(freq):
                 speed = str(core.current)
