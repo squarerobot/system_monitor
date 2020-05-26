@@ -4,7 +4,11 @@ project(system_monitor)
 find_package(catkin REQUIRED COMPONENTS
   rospy
   std_msgs
+  catkin_pip
   message_generation)
+
+# catkin_pip_setup()
+catkin_pip_requirements(${CMAKE_CURRENT_SOURCE_DIR}/requirements.txt)
 
 add_message_files(
    FILES
@@ -28,7 +32,7 @@ add_message_files(
 
 generate_messages(
    DEPENDENCIES
-   std_msgs  
+   std_msgs
    system_monitor # Or other packages containing msgs
 )
 
@@ -53,6 +57,6 @@ install(PROGRAMS
 
 
 install(
-  DIRECTORY bin config launch 
+  DIRECTORY bin config launch
   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
 )
