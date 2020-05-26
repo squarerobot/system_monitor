@@ -124,32 +124,15 @@ class MemMonitor():
         mem_dict = { 0: 'OK', 1: 'Low Memory', 2: 'Very Low Memory' }
 
         try:
-            p = subprocess.Popen('free -tm',
-                                stdout = subprocess.PIPE,
-                                stderr = subprocess.PIPE, shell = True)
-            stdout, stderr = p.communicate()
-            retcode = p.returncode
+            # p = subprocess.Popen('free -tm',
+            #                     stdout = subprocess.PIPE,
+            #                     stderr = subprocess.PIPE, shell = True)
+            # stdout, stderr = p.communicate()
+            # retcode = p.returncode
 
-            if retcode != 0:
-                values.append(KeyValue(key = "\"free -tm\" Call Error", value = str(retcode)))
-                return DiagnosticStatus.ERROR, values
-
-            rows = stdout.split('\n')
-            data = rows[1].split()
-            total_mem_physical = data[1]
-            used_mem_physical = data[2]
-            free_mem_physical = data[3]
-            data = rows[1].split()
-            used_mem_wo_buffers = data[5]
-            free_mem_wo_buffers = data[6]
-            data = rows[2].split()
-            total_mem_swap = data[1]
-            used_mem_swap = data[2]
-            free_mem_swap = data[3]
-            data = rows[3].split()
-            total_mem = data[1]
-            used_mem = data[2]
-            free_mem = data[3]
+            # if retcode != 0:
+            #     values.append(KeyValue(key = "\"free -tm\" Call Error", value = str(retcode)))
+            #     return DiagnosticStatus.ERROR, values
 
             mem = psutil.virtual_memory()
             swp = psutil.swap_memory()
@@ -166,17 +149,59 @@ class MemMonitor():
             used_mem = mem.used + swp.used
             free_mem = mem.free + swp.free
 
-            total_mem_physical = round(total_mem_physical/bytes_to_mega,0)
-            used_mem_physical = round(used_mem_physical/bytes_to_mega,0)
-            free_mem_physical = round(free_mem_physical/bytes_to_mega,0)
-            used_mem_wo_buffers = round(used_mem_wo_buffers/bytes_to_mega,0)
-            free_mem_wo_buffers = round(free_mem_wo_buffers/bytes_to_mega,0)
-            total_mem_swap = round(total_mem_swap/bytes_to_mega,0)
-            used_mem_swap = round(used_mem_swap/bytes_to_mega,0)
-            free_mem_swap = round(free_mem_swap/bytes_to_mega,0)
-            total_mem = round(total_mem/bytes_to_mega,0)
-            used_mem = round(used_mem/bytes_to_mega,0)
-            free_mem = round(free_mem/bytes_to_mega,0)
+            total_mem_physical = int(round(total_mem_physical/bytes_to_mega,0))
+            used_mem_physical = int(round(used_mem_physical/bytes_to_mega,0))
+            free_mem_physical = int(round(free_mem_physical/bytes_to_mega,0))
+            used_mem_wo_buffers = int(round(used_mem_wo_buffers/bytes_to_mega,0))
+            free_mem_wo_buffers = int(round(free_mem_wo_buffers/bytes_to_mega,0))
+            total_mem_swap = int(round(total_mem_swap/bytes_to_mega,0))
+            used_mem_swap = int(round(used_mem_swap/bytes_to_mega,0))
+            free_mem_swap = int(round(free_mem_swap/bytes_to_mega,0))
+            total_mem = int(round(total_mem/bytes_to_mega,0))
+            used_mem = int(round(used_mem/bytes_to_mega,0))
+            free_mem = int(round(free_mem/bytes_to_mega,0))
+
+            # print("total_mem_physical  :" + str(total_mem_physical)+"MB")
+            # print("used_mem_physical   :" + str(used_mem_physical)+"MB")
+            # print("free_mem_physical   :" + str(free_mem_physical)+"MB")
+            # print("used_mem_wo_buffers :" + str(used_mem_wo_buffers)+"MB")
+            # print("free_mem_wo_buffers :" + str(free_mem_wo_buffers)+"MB")
+            # print("total_mem_swap      :" + str(total_mem_swap)+"MB")
+            # print("used_mem_swap       :" + str(used_mem_swap)+"MB")
+            # print("free_mem_swap       :" + str(free_mem_swap)+"MB")
+            # print("total_mem           :" + str(total_mem)+"MB")
+            # print("used_mem            :" + str(used_mem)+"MB")
+            # print("free_mem            :" + str(free_mem)+"MB")
+
+            # rows = stdout.split('\n')
+            # data = rows[1].split()
+            # total_mem_physical = data[1]
+            # used_mem_physical = data[2]
+            # free_mem_physical = data[3]
+            # data = rows[1].split()
+            # used_mem_wo_buffers = data[5]
+            # free_mem_wo_buffers = data[6]
+            # data = rows[2].split()
+            # total_mem_swap = data[1]
+            # used_mem_swap = data[2]
+            # free_mem_swap = data[3]
+            # data = rows[3].split()
+            # total_mem = data[1]
+            # used_mem = data[2]
+            # free_mem = data[3]
+
+            # print("total_mem_physical  :" + str(total_mem_physical)+"MB")
+            # print("used_mem_physical   :" + str(used_mem_physical)+"MB")
+            # print("free_mem_physical   :" + str(free_mem_physical)+"MB")
+            # print("used_mem_wo_buffers :" + str(used_mem_wo_buffers)+"MB")
+            # print("free_mem_wo_buffers :" + str(free_mem_wo_buffers)+"MB")
+            # print("total_mem_swap      :" + str(total_mem_swap)+"MB")
+            # print("used_mem_swap       :" + str(used_mem_swap)+"MB")
+            # print("free_mem_swap       :" + str(free_mem_swap)+"MB")
+            # print("total_mem           :" + str(total_mem)+"MB")
+            # print("used_mem            :" + str(used_mem)+"MB")
+            # print("free_mem            :" + str(free_mem)+"MB")
+
 
             level = DiagnosticStatus.OK
             mem_usage = float(used_mem_wo_buffers)/float(total_mem_physical)
