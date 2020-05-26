@@ -51,6 +51,7 @@ import subprocess
 import string
 
 import socket
+import psutil
 
 from diagnostic_msgs.msg import DiagnosticArray, DiagnosticStatus, KeyValue
 
@@ -83,7 +84,7 @@ def update_status_stale(stat, last_update_time):
     stat.values.pop(0)
     stat.values.insert(0, KeyValue(key = 'Update Status', value = stale_status))
     stat.values.insert(1, KeyValue(key = 'Time Since Update', value = str(time_since_update)))
-    
+
 
 class MemMonitor():
     def __init__(self, hostname, diag_hostname):
@@ -95,7 +96,7 @@ class MemMonitor():
         self._mem_level_error = rospy.get_param('~mem_level_error', mem_level_error)
 
         self._usage_timer = None
-        
+
         self._usage_stat = DiagnosticStatus()
         self._usage_stat.name = 'Memory Usage (%s)' % diag_hostname
         self._usage_stat.level = 1
@@ -150,6 +151,33 @@ class MemMonitor():
             used_mem = data[2]
             free_mem = data[3]
 
+            mem = psutil.virtual_memory()
+            swp = psutil.swap_memory()
+            bytes_to_mega = 1048576
+            total_mem_physical = mem.total
+            used_mem_physical = mem.used
+            free_mem_physical = mem.free
+            used_mem_wo_buffers = mem.buffers+mem.cached
+            free_mem_wo_buffers = mem.available
+            total_mem_swap = swp.total
+            used_mem_swap = swp.used
+            free_mem_swap = swp.free
+            total_mem = mem.total + swp.total
+            used_mem = mem.used + swp.used
+            free_mem = mem.free + swp.free
+
+            total_mem_physical = round(total_mem_physical/bytes_to_mega,0)
+            used_mem_physical = round(used_mem_physical/bytes_to_mega,0)
+            free_mem_physical = round(free_mem_physical/bytes_to_mega,0)
+            used_mem_wo_buffers = round(used_mem_wo_buffers/bytes_to_mega,0)
+            free_mem_wo_buffers = round(free_mem_wo_buffers/bytes_to_mega,0)
+            total_mem_swap = round(total_mem_swap/bytes_to_mega,0)
+            used_mem_swap = round(used_mem_swap/bytes_to_mega,0)
+            free_mem_swap = round(free_mem_swap/bytes_to_mega,0)
+            total_mem = round(total_mem/bytes_to_mega,0)
+            used_mem = round(used_mem/bytes_to_mega,0)
+            free_mem = round(free_mem/bytes_to_mega,0)
+
             level = DiagnosticStatus.OK
             mem_usage = float(used_mem_wo_buffers)/float(total_mem_physical)
             if (mem_usage < self._mem_level_warn):
@@ -185,7 +213,7 @@ class MemMonitor():
         if rospy.is_shutdown():
             with self._mutex:
                 self.cancel_timers()
-            return 
+            return
 
         diag_level = 0
         diag_vals = [ KeyValue(key = 'Update Status', value = 'OK' ),
@@ -209,9 +237,9 @@ class MemMonitor():
             self._last_usage_time = rospy.get_time()
             self._usage_stat.level = diag_level
             self._usage_stat.values = diag_vals
-            
+
             self._usage_stat.message = usage_msg
-            
+
             if not rospy.is_shutdown():
                 self._usage_timer = threading.Timer(5.0, self.check_usage)
                 self._usage_timer.start()
