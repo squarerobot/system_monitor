@@ -148,27 +148,36 @@ class Monitor():
             value = item.value
             if key == 'Update Status':
                 aux_usa.status = value
-            if key == 'Time Since Last Update':
+                continue
+            if key == 'Time Since Update':
                 aux_usa.time = float(value)
+                continue
             if key == 'Logical Core Number':
                 aux_usa.logical_cores = int(value)
+                continue
             if key == 'Load Average Status':
                 aux_usa.load_status = value
+                continue
             if key == 'Load Average (1min)':
                 value = value.split('%')
                 aux_usa.load_avg1 = float(value[0])
+                continue
             if key == 'Load Average (5min)':
                 value = value.split('%')
                 aux_usa.load_avg5 = float(value[0])
+                continue
             if key == 'Load Average (15min)':
                 value = value.split('%')
                 aux_usa.load_avg15 = float(value[0])
+                continue
             if key == 'Load Now':
                 value = value.split('%')
                 aux_usa.load_now = float(value[0])
+                continue
             if key == 'CPU Clock Speed':
                 value = value.split('MHz')
                 aux_usa.speed = float(value[0])
+                continue
 
         usa_freq_core_labels = []
         usa_stat_core_labels = []
