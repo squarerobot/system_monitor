@@ -47,11 +47,10 @@ import threading
 from threading import Timer
 import sys, os, time
 from time import sleep
-import subprocess
+import psutil
 import string
 
 import socket
-import psutil
 
 from diagnostic_msgs.msg import DiagnosticArray, DiagnosticStatus, KeyValue
 
@@ -152,20 +151,9 @@ class MemMonitor():
             used_mem = int(round(used_mem/bytes_to_mega,0))
             free_mem = int(round(free_mem/bytes_to_mega,0))
 
-            # print("total_mem_physical  :" + str(total_mem_physical)+"MB")
-            # print("used_mem_physical   :" + str(used_mem_physical)+"MB")
-            # print("free_mem_physical   :" + str(free_mem_physical)+"MB")
-            # print("used_mem_wo_buffers :" + str(used_mem_wo_buffers)+"MB")
-            # print("free_mem_wo_buffers :" + str(free_mem_wo_buffers)+"MB")
-            # print("total_mem_swap      :" + str(total_mem_swap)+"MB")
-            # print("used_mem_swap       :" + str(used_mem_swap)+"MB")
-            # print("free_mem_swap       :" + str(free_mem_swap)+"MB")
-            # print("total_mem           :" + str(total_mem)+"MB")
-            # print("used_mem            :" + str(used_mem)+"MB")
-            # print("free_mem            :" + str(free_mem)+"MB")
-
             level = DiagnosticStatus.OK
-            mem_usage = float(used_mem_wo_buffers)/float(total_mem_physical)
+
+            mem_usage = mem.percent
             if (mem_usage < self._mem_level_warn):
                 level = DiagnosticStatus.OK
             elif (mem_usage < self._mem_level_error):
