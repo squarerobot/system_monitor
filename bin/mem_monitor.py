@@ -153,7 +153,7 @@ class MemMonitor():
 
             level = DiagnosticStatus.OK
 
-            mem_usage = mem.percent
+            mem_usage = mem.percent/100
             if (mem_usage < self._mem_level_warn):
                 level = DiagnosticStatus.OK
             elif (mem_usage < self._mem_level_error):
