@@ -13,7 +13,7 @@ class Monitor():
         self._diag_cpu_temp = DiagnosticCPUTemperature()
         self._diag_cpu_usa = DiagnosticCPUUsage()
         self._diag_hdd = DiagnosticHDD()
-        r = rospy.get_param("rate_param", 0.5)
+        r = rospy.get_param("rate_param", 5)
         self._rate = rospy.Rate(r)
 
     #Update network values
