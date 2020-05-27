@@ -300,58 +300,6 @@ class hdd_monitor():
                 diag_message = usage_dict[diag_level]
                 i += 1
 
-            # p = subprocess.Popen(["df", "-Pht", "ext4"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-            # stdout, stderr = p.communicate()
-            # retcode = p.returncode
-            # if (retcode == 0 or retcode == 1):
-            #     diag_vals.append(KeyValue(key = 'Disk Space Reading', value = 'OK'))
-            #     rows = stdout.split('\n')
-            #     del rows[0]
-            #     row_count = 0
-
-            #     for row in rows:
-            #         if len(row.split()) < 2:
-            #             continue
-            #         if unicode(row.split()[0]) == "none":
-            #             continue
-
-            #         row_count += 1
-            #         g_available = row.split()[-3]
-            #         g_use = row.split()[-2]
-            #         name = row.split()[0]
-            #         size = row.split()[1]
-            #         mount_pt = row.split()[-1]
-
-            #         hdd_usage = float(g_use.replace("%", ""))*1e-2
-            #         if (hdd_usage < self._hdd_level_warn):
-            #             level = DiagnosticStatus.OK
-            #         elif (hdd_usage < self._hdd_level_error):
-            #             level = DiagnosticStatus.WARN
-            #         else:
-            #             level = DiagnosticStatus.ERROR
-
-            #         diag_vals.append(KeyValue(
-            #                 key = 'Disk %d Name' % row_count, value = name))
-            #         diag_vals.append(KeyValue(
-            #                 key = 'Disk %d Size' % row_count, value = size))
-            #         diag_vals.append(KeyValue(
-            #                 key = 'Disk %d Available' % row_count, value = g_available))
-            #         diag_vals.append(KeyValue(
-            #                 key = 'Disk %d Use' % row_count, value = g_use))
-            #         diag_vals.append(KeyValue(
-            #                 key = 'Disk %d Status' % row_count, value = stat_dict[level]))
-            #         diag_vals.append(KeyValue(
-            #                 key = 'Disk %d Mount Point' % row_count, value = mount_pt))
-
-            #         diag_level = max(diag_level, level)
-            #         diag_message = usage_dict[diag_level]
-
-            # else:
-            #     diag_vals.append(KeyValue(key = 'Disk Space Reading', value = 'Failed'))
-            #     diag_level = DiagnosticStatus.ERROR
-            #     diag_message = stat_dict[diag_level]
-
-
         except:
             rospy.logerr(traceback.format_exc())
 

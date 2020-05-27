@@ -307,20 +307,6 @@ class Monitor():
 
         aux_stat.disks.append(disk)
 
-        # aux_stat.status = status.values[0].value
-        # aux_stat.time = float(status.values[1].value)
-        # aux_stat.space_reading = status.values[2].value
-        # num_disks = (len(status.values) - 3)/6
-        # for i in range(0,num_disks):
-        #     disk = Disk()
-        #     disk.id = i + 1
-        #     disk.name = status.values[3 + i * 6].value
-        #     disk.size = float(status.values[4 + i * 6].value[:-1])
-        #     disk.available = float(status.values[5 + i * 6].value[:-1])
-        #     disk.use = float(status.values[6 + i * 6].value[:-1])
-        #     disk.status = status.values[7 + i * 6].value
-        #     disk.mount_point = status.values[8 + i * 6].value
-        #     aux_stat.disks.append(disk)
         self._diag_hdd.status = aux_stat
         self.publish_info()
 
