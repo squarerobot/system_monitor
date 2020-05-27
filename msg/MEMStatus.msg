@@ -1,4 +1,3 @@
-string status
 float32 time
 system_monitor/Memory[] memories
 #Memory space in M

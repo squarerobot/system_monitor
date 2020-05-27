@@ -59,8 +59,6 @@ class Monitor():
             buf_item = False
             key = item.key
             value = item.value
-            if key == 'Update Status':
-                mem_status.status = value
             if key == 'Time Since Last Update':
                 mem_status.time = float(value)
             if '(Physical)' in key:
