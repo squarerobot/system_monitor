@@ -47,23 +47,80 @@ class Monitor():
         self._diag_mem.message = status.message
         self._diag_mem.hardware_id = status.hardware_id
         mem_status = MEMStatus()
-        mem_status.time = float(status.values[1].value)
-        mem_status.totalM = int(status.values[-3].value[:-1])
-        mem_status.usedM = int(status.values[-2].value[:-1])
-        mem_status.freeM = int(status.values[-1].value[:-1])
-        names = ['Physical','Swap']
-        for i in xrange(0, 2):
-            mem = Memory()
-            mem.name = names[i]
-            mem.total = int(status.values[3+5*i].value[:-1])
-            mem.used = int(status.values[4+5*i].value[:-1])
-            mem.free = int(status.values[5+5*i].value[:-1])
-            mem_status.memories.append(mem)
-        mem = Memory()
-        mem.name = "Physical w/o buffers"
-        mem.used = int(status.values[6].value[:-1])
-        mem.free = int(status.values[7].value[:-1])
-        mem_status.memories.append(mem)
+        phy_mem = Memory()
+        swp_mem = Memory()
+        buf_mem = Memory()
+        phy_mem.name = "Physical"
+        swp_mem.name = "Swap"
+        buf_mem.name = "Physical w/o buffers"
+        for item in status.values:
+            phy_item = False
+            swap_item = False
+            buf_item = False
+            key = item.key
+            value = item.value
+            if key == 'Update Status':
+                mem_status.status = value
+            if key == 'Time Since Last Update':
+                mem_status.time = float(value)
+            if '(Physical)' in key:
+                phy_item = True
+            if '(Swap)' in key:
+                swap_item = True
+            if '(Physical w/o Buffers)' in key:
+                buf_item = True
+            if 'Total Memory'in key:
+                value = value.split("M")
+                if phy_item:
+                    phy_mem.total = int(value[0])
+                elif swap_item:
+                    swp_mem.total = int(value[0])
+                elif buf_item:
+                    buf_mem.total = int(value[0])
+                else:
+                    mem_status.totalM = int(value[0])
+            if 'Used Memory' in key:
+                value = value.split("M")
+                if phy_item:
+                    phy_mem.used = int(value[0])
+                elif swap_item:
+                    swp_mem.used = int(value[0])
+                elif buf_item:
+                    buf_mem.used = int(value[0])
+                else:
+                    mem_status.usedM = int(value[0])
+
+            if 'Free Memory' in key:
+                value = value.split("M")
+                if phy_item:
+                    phy_mem.free = int(value[0])
+                elif swap_item:
+                    swp_mem.free = int(value[0])
+                elif buf_item:
+                    buf_mem.free = int(value[0])
+                else:
+                    mem_status.freeM = int(value[0])
+
+            mem_status.memories.append(phy_mem)
+            mem_status.memories.append(swp_mem)
+            mem_status.memories.append(buf_mem)
+        # mem_status.time = float(status.values[1].value)
+        # mem_status.totalM = int(status.values[-3].value[:-1])
+        # mem_status.usedM = int(status.values[-2].value[:-1])
+        # mem_status.freeM = int(status.values[-1].value[:-1])
+        # names = ['Physical','Swap']
+        # for i in xrange(0, 2):
+        #     mem = Memory()
+        #     mem.name = names[i]
+        #     mem.total = int(status.values[3+5*i].value[:-1])
+        #     mem.used = int(status.values[4+5*i].value[:-1])
+        #     mem.free = int(status.values[5+5*i].value[:-1])
+        #     mem_status.memories.append(mem)
+        # mem = Memory()
+        # mem.name = "Physical w/o buffers"
+        # mem.used = int(status.values[6].value[:-1])
+        # mem.free = int(status.values[7].value[:-1])
+        # mem_status.memories.append(mem)
         self._diag_mem.status = mem_status
         self.publish_info()
 

@@ -139,17 +139,17 @@ class MemMonitor():
             used_mem = mem.used + swp.used
             free_mem = mem.free + swp.free
 
-            total_mem_physical = int(round(total_mem_physical/bytes_to_mega,0))
-            used_mem_physical = int(round(used_mem_physical/bytes_to_mega,0))
-            free_mem_physical = int(round(free_mem_physical/bytes_to_mega,0))
-            used_mem_wo_buffers = int(round(used_mem_wo_buffers/bytes_to_mega,0))
-            free_mem_wo_buffers = int(round(free_mem_wo_buffers/bytes_to_mega,0))
-            total_mem_swap = int(round(total_mem_swap/bytes_to_mega,0))
-            used_mem_swap = int(round(used_mem_swap/bytes_to_mega,0))
-            free_mem_swap = int(round(free_mem_swap/bytes_to_mega,0))
-            total_mem = int(round(total_mem/bytes_to_mega,0))
-            used_mem = int(round(used_mem/bytes_to_mega,0))
-            free_mem = int(round(free_mem/bytes_to_mega,0))
+            total_mem_physical = str(int(round(total_mem_physical/bytes_to_mega,0)))+ "M"
+            used_mem_physical = str(int(round(used_mem_physical/bytes_to_mega,0)))+ "M"
+            free_mem_physical = str(int(round(free_mem_physical/bytes_to_mega,0)))+ "M"
+            used_mem_wo_buffers = str(int(round(used_mem_wo_buffers/bytes_to_mega,0)))+ "M"
+            free_mem_wo_buffers = str(int(round(free_mem_wo_buffers/bytes_to_mega,0)))+ "M"
+            total_mem_swap = str(int(round(total_mem_swap/bytes_to_mega,0)))+ "M"
+            used_mem_swap = str(int(round(used_mem_swap/bytes_to_mega,0)))+ "M"
+            free_mem_swap = str(int(round(free_mem_swap/bytes_to_mega,0)))+ "M"
+            total_mem = str(int(round(total_mem/bytes_to_mega,0)))+ "M"
+            used_mem = str(int(round(used_mem/bytes_to_mega,0)))+ "M"
+            free_mem = str(int(round(free_mem/bytes_to_mega,0)))+ "M"
 
             level = DiagnosticStatus.OK
 
@@ -162,17 +162,17 @@ class MemMonitor():
                 level = DiagnosticStatus.ERROR
 
             values.append(KeyValue(key = 'Memory Status', value = mem_dict[level]))
-            values.append(KeyValue(key = 'Total Memory (Physical)', value = total_mem_physical+"M"))
-            values.append(KeyValue(key = 'Used Memory (Physical)', value = used_mem_physical+"M"))
-            values.append(KeyValue(key = 'Free Memory (Physical)', value = free_mem_physical+"M"))
-            values.append(KeyValue(key = 'Used Memory (Physical w/o Buffers)', value = used_mem_wo_buffers+"M"))
-            values.append(KeyValue(key = 'Free Memory (Physical w/o Buffers)', value = free_mem_wo_buffers+"M"))
-            values.append(KeyValue(key = 'Total Memory (Swap)', value = total_mem_swap+"M"))
-            values.append(KeyValue(key = 'Used Memory (Swap)', value = used_mem_swap+"M"))
-            values.append(KeyValue(key = 'Free Memory (Swap)', value = free_mem_swap+"M"))
-            values.append(KeyValue(key = 'Total Memory', value = total_mem+"M"))
-            values.append(KeyValue(key = 'Used Memory', value = used_mem+"M"))
-            values.append(KeyValue(key = 'Free Memory', value = free_mem+"M"))
+            values.append(KeyValue(key = 'Total Memory (Physical)', value = total_mem_physical))
+            values.append(KeyValue(key = 'Used Memory (Physical)', value = used_mem_physical))
+            values.append(KeyValue(key = 'Free Memory (Physical)', value = free_mem_physical))
+            values.append(KeyValue(key = 'Used Memory (Physical w/o Buffers)', value = used_mem_wo_buffers))
+            values.append(KeyValue(key = 'Free Memory (Physical w/o Buffers)', value = free_mem_wo_buffers))
+            values.append(KeyValue(key = 'Total Memory (Swap)', value = total_mem_swap))
+            values.append(KeyValue(key = 'Used Memory (Swap)', value = used_mem_swap))
+            values.append(KeyValue(key = 'Free Memory (Swap)', value = free_mem_swap))
+            values.append(KeyValue(key = 'Total Memory', value = total_mem))
+            values.append(KeyValue(key = 'Used Memory', value = used_mem))
+            values.append(KeyValue(key = 'Free Memory', value = free_mem))
 
             msg = mem_dict[level]
         except Exception, e:
