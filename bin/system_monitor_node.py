@@ -255,20 +255,72 @@ class Monitor():
         self._diag_hdd.message = status.message
         self._diag_hdd.hardware_id = status.hardware_id
         aux_stat = HDDStatus()
-        aux_stat.status = status.values[0].value
-        aux_stat.time = float(status.values[1].value)
-        aux_stat.space_reading = status.values[2].value
-        num_disks = (len(status.values) - 3)/6
-        for i in range(0,num_disks):
-            disk = Disk()
-            disk.id = i + 1
-            disk.name = status.values[3 + i * 6].value
-            disk.size = float(status.values[4 + i * 6].value[:-1])
-            disk.available = float(status.values[5 + i * 6].value[:-1])
-            disk.use = float(status.values[6 + i * 6].value[:-1])
-            disk.status = status.values[7 + i * 6].value
-            disk.mount_point = status.values[8 + i * 6].value
-            aux_stat.disks.append(disk)
+        first_disk = True
+        for item in status.values:
+            key = item.key
+            value = item.value
+            if key == 'Update Status':
+                aux_stat.status = value
+                continue
+            if key == 'Time Since Update':
+                aux_stat.time = float(value)
+                continue
+            if key == 'Disk Space Reading':
+                aux_stat.space_reading = value
+                continue
+            if 'Name' in key:
+                aux = key.split(' ')
+                current_disk = aux[1]
+                if first_disk:
+                    first_disk = False
+                else:
+                    aux_stat.disks.append(disk)
+                disk = Disk()
+                disk.id = int(current_disk)
+                disk_name_key = 'Disk ' + str(current_disk) + ' Name'
+                disk_size_key = 'Disk ' + str(current_disk) + ' Size'
+                disk_aval_key = 'Disk ' + str(current_disk) + ' Available'
+                disk_use_key = 'Disk ' + str(current_disk) + ' Use'
+                disk_stat_key = 'Disk ' + str(current_disk) + ' Status'
+                disk_mp_key = 'Disk ' + str(current_disk) + ' Mount Point'
+            if key == disk_name_key:
+                disk.name = value
+                continue
+            if key == disk_size_key:
+                value = value.split('G')
+                disk.size = float(value[0])
+                continue
+            if key == disk_aval_key:
+                value = value.split('G')
+                disk.available = float(value[0])
+                continue
+            if key == disk_use_key:
+                value = value.split('%')
+                disk.use = float(value[0])
+                continue
+            if key == disk_stat_key:
+                disk.status = value
+                continue
+            if key == disk_mp_key:
+                disk.mount_point = value
+                continue
+
+        aux_stat.disks.append(disk)
+
+        # aux_stat.status = status.values[0].value
+        # aux_stat.time = float(status.values[1].value)
+        # aux_stat.space_reading = status.values[2].value
+        # num_disks = (len(status.values) - 3)/6
+        # for i in range(0,num_disks):
+        #     disk = Disk()
+        #     disk.id = i + 1
+        #     disk.name = status.values[3 + i * 6].value
+        #     disk.size = float(status.values[4 + i * 6].value[:-1])
+        #     disk.available = float(status.values[5 + i * 6].value[:-1])
+        #     disk.use = float(status.values[6 + i * 6].value[:-1])
+        #     disk.status = status.values[7 + i * 6].value
+        #     disk.mount_point = status.values[8 + i * 6].value
+        #     aux_stat.disks.append(disk)
         self._diag_hdd.status = aux_stat
         self.publish_info()
 
