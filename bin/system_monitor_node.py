@@ -99,9 +99,9 @@ class Monitor():
                 else:
                     mem_status.freeM = int(value[0])
 
-            mem_status.memories.append(phy_mem)
-            mem_status.memories.append(swp_mem)
-            mem_status.memories.append(buf_mem)
+        mem_status.memories.append(phy_mem)
+        mem_status.memories.append(swp_mem)
+        mem_status.memories.append(buf_mem)
         # mem_status.time = float(status.values[1].value)
         # mem_status.totalM = int(status.values[-3].value[:-1])
         # mem_status.usedM = int(status.values[-2].value[:-1])
