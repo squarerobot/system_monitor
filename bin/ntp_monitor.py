@@ -38,6 +38,7 @@
 
 from diagnostic_msgs.msg import DiagnosticArray, DiagnosticStatus, KeyValue
 
+import traceback
 import sys
 import rospy
 import socket
@@ -106,6 +107,7 @@ def ntp_monitor(offset=500, self_offset=500, diag_hostname = None, error_offset 
             else:
                 raise
         except Exception, e:
+            rospy.logerr(traceback.format_exc())
             stat.level = DiagnosticStatus.ERROR
             stat.message = "Error Running ntpdate"
             stat.values = [
