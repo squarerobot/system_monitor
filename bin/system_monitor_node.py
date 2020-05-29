@@ -80,23 +80,6 @@ class Monitor():
                 inter.txError = int(value)
                 continue
         net_status.interfaces.append(inter)
-
-        # net_status.status = status.values[0].value
-        # net_status.time = float(status.values[1].value)
-        # ifaces = (len(status.values) - 2) / 10
-        # for i in xrange(0, ifaces):
-        #     inter = Interface()
-        #     inter.name = status.values[2+10*i].value
-        #     inter.state = status.values[3+10*i].value
-        #     inter.input = float(status.values[4+10*i].value[:-6])
-        #     inter.output = float(status.values[5+10*i].value[:-6])
-        #     inter.mtu = int(status.values[6+10*i].value)
-        #     inter.received = float(status.values[7+10*i].value)
-        #     inter.transmitted = float(status.values[8+10*i].value)
-        #     inter.collisions = int(status.values[9+10*i].value)
-        #     inter.rxError = int(status.values[10+10*i].value)
-        #     inter.txError = int(status.values[11+10*i].value)
-        #     net_status.interfaces.append(inter)
         self._diag_net.status = net_status
         self.publish_info()
 

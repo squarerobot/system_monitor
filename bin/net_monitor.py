@@ -47,7 +47,6 @@ import threading
 from threading import Timer
 import sys, os, time
 from time import sleep
-# import subprocess
 import psutil
 import string
 import re
@@ -228,66 +227,6 @@ class NetMonitor():
           key = iface_name + ' Tx Errors',
           value = str(iface_error_out)
         ))
-
-      # p = subprocess.Popen('ifstat -q -S 1 1',
-      #                      stdout = subprocess.PIPE,
-      #                      stderr = subprocess.PIPE, shell = True)
-      # stdout, stderr = p.communicate()
-      # retcode = p.returncode
-      # if retcode == 3:
-      #   values.append(KeyValue(key = "\"ifstat -q -S 1 1\" Call Error",
-      #     value = str(retcode)))
-      #   return DiagnosticStatus.ERROR, net_dict[3], values
-      # rows = stdout.split('\n')
-      # data = rows[0].split()
-      # ifaces = []
-      # for i in range(0, len(data)):
-      #   ifaces.append(data[i])
-      # data = rows[2].split()
-      # kb_in = []
-      # kb_out = []
-      # for i in range(0, len(data), 2):
-      #   kb_in.append(data[i])
-      #   kb_out.append(data[i + 1])
-      # level = DiagnosticStatus.OK
-      # for i in range(0, len(ifaces)):
-      #   values.append(KeyValue(key = 'Interface Name',
-      #     value = ifaces[i]))
-      #   (retcode, cmd_out) = get_sys_net(ifaces[i], 'operstate')
-      #   if retcode == 0:
-      #     values.append(KeyValue(key = 'State', value = cmd_out))
-      #     ifacematch = re.match('eth[0-9]+', ifaces[i])
-      #     if ifacematch and (cmd_out == 'down' or cmd_out == 'dormant'):
-      #       level = DiagnosticStatus.ERROR
-      #   values.append(KeyValue(key = 'Input Traffic',
-      #     value = str(float(kb_in[i]) / 1024) + " (MB/s)"))
-      #   values.append(KeyValue(key = 'Output Traffic',
-      #     value = str(float(kb_out[i]) / 1024) + " (MB/s)"))
-      #   net_usage_in = float(kb_in[i]) / 1024 / self._net_capacity
-      #   net_usage_out = float(kb_out[i]) / 1024 / self._net_capacity
-      #   if net_usage_in > self._net_level_warn or\
-      #     net_usage_out > self._net_level_warn:
-      #     level = DiagnosticStatus.WARN
-      #   (retcode, cmd_out) = get_sys_net(ifaces[i], 'mtu')
-      #   if retcode == 0:
-      #     values.append(KeyValue(key = 'MTU', value = cmd_out))
-      #   (retcode, cmd_out) = get_sys_net_stat(ifaces[i], 'rx_bytes')
-      #   if retcode == 0:
-      #     values.append(KeyValue(key = 'Total received MB',
-      #       value = str(float(cmd_out) / 1024 / 1024)))
-      #   (retcode, cmd_out) = get_sys_net_stat(ifaces[i], 'tx_bytes')
-      #   if retcode == 0:
-      #     values.append(KeyValue(key = 'Total transmitted MB',
-      #       value = str(float(cmd_out) / 1024 / 1024)))
-      #   (retcode, cmd_out) = get_sys_net_stat(ifaces[i], 'collisions')
-      #   if retcode == 0:
-      #     values.append(KeyValue(key = 'Collisions', value = cmd_out))
-      #   (retcode, cmd_out) = get_sys_net_stat(ifaces[i], 'rx_errors')
-      #   if retcode == 0:
-      #     values.append(KeyValue(key = 'Rx Errors', value = cmd_out))
-      #   (retcode, cmd_out) = get_sys_net_stat(ifaces[i], 'tx_errors')
-      #   if retcode == 0:
-      #     values.append(KeyValue(key = 'Tx Errors', value = cmd_out))
     except Exception, e:
       rospy.logerr(traceback.format_exc())
       msg = 'Network Usage Check Error'
