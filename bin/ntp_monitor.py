@@ -42,6 +42,7 @@ import sys
 import rospy
 import socket
 from subprocess import Popen, PIPE
+import ntplib
 
 import time
 
@@ -75,24 +76,33 @@ def ntp_monitor(offset=500, self_offset=500, diag_hostname = None, error_offset 
 #    self_stat.hardware_id = hostname
 #    self_stat.values = []
 
+    ntp_obj = ntplib.NTPClient()
+
+
     while not rospy.is_shutdown():
         for st,host,off in [(stat,ntp_hostname,offset)]:
             try:
-                p = Popen(["ntpdate", "-q", host], stdout=PIPE, stdin=PIPE, stderr=PIPE)
-                res = p.wait()
-                (o,e) = p.communicate()
-            except OSError, (errno, msg):
-                if errno == 4:
-                    break #ctrl-c interrupt
-                else:
-                    raise
-            if (res == 0):
-                measured_offset = float(re.search("offset (.*),", o).group(1))*1000000
+                # p = Popen(["ntpdate", "-q", host], stdout=PIPE, stdin=PIPE, stderr=PIPE)
+                # res = p.wait()
+                # (o,e) = p.communicate()
+                ntp_response = ntp_obj.request(host, version=3)
+                measured_offset = ntp_response.offset * 1000000
                 st.level = DiagnosticStatus.OK
                 st.message = "OK"
-                st.values = [ KeyValue("Offset (us)", str(measured_offset)),
-                              KeyValue("Offset tolerance (us)", str(off)),
-                              KeyValue("Offset tolerance (us) for Error", str(error_offset)) ]
+                st.values = [
+                    KeyValue(
+                        key = "Offset (us)",
+                        value = str(measured_offset)
+                    ),
+                    KeyValue(
+                        key = "Offset tolerance (us)",
+                        value = str(off)
+                    ),
+                    KeyValue(
+                        key = "Offset tolerance (us) for Error",
+                        value = str(error_offset)
+                    ),
+                ]
 
                 if (abs(measured_offset) > off):
                     st.level = DiagnosticStatus.WARN
@@ -101,14 +111,54 @@ def ntp_monitor(offset=500, self_offset=500, diag_hostname = None, error_offset 
                     st.level = DiagnosticStatus.ERROR
                     st.message = "NTP Offset Too High"
 
-            else:
+            except OSError, (errno, msg):
+                if errno == 4:
+                    break #ctrl-c interrupt
+                else:
+                    raise
+
+            except Exception, e:
                 st.level = DiagnosticStatus.ERROR
-                st.message = "Error Running ntpdate. Returned %d" % res
-                st.values = [ KeyValue("Offset (us)", "N/A"),
-                              KeyValue("Offset tolerance (us)", str(off)),
-                              KeyValue("Offset tolerance (us) for Error", str(error_offset)),
-                              KeyValue("Output", o),
-                              KeyValue("Errors", e) ]
+                st.message = "Error Running ntpdate"
+                st.values = [
+                    KeyValue(
+                        key = "Offset (us)",
+                        value ="N/A"
+                    ),
+                    KeyValue(
+                        key = "Offset tolerance (us)",
+                                value =str(off)
+                    ),
+                    KeyValue(
+                        key = "Offset tolerance (us) for Error",
+                        value =str(error_offset)
+                    ),
+                ]
+
+
+            # if (res == 0):
+            #     measured_offset = float(re.search("offset (.*),", o).group(1))*1000000
+            #     st.level = DiagnosticStatus.OK
+            #     st.message = "OK"
+            #     st.values = [ KeyValue("Offset (us)", str(measured_offset)),
+            #                   KeyValue("Offset tolerance (us)", str(off)),
+            #                   KeyValue("Offset tolerance (us) for Error", str(error_offset)) ]
+
+            #     if (abs(measured_offset) > off):
+            #         st.level = DiagnosticStatus.WARN
+            #         st.message = "NTP Offset Too High"
+            #     if (abs(measured_offset) > error_offset):
+            #         st.level = DiagnosticStatus.ERROR
+            #         st.message = "NTP Offset Too High"
+
+            # else:
+            #     st.level = DiagnosticStatus.ERROR
+            #     st.message = "Error Running ntpdate. Returned %d" % res
+            #     st.values = [ KeyValue("Offset (us)", "N/A"),
+            #                   KeyValue("Offset tolerance (us)", str(off)),
+            #                   KeyValue("Offset tolerance (us) for Error", str(error_offset)),
+            #                   KeyValue("Output", o),
+            #                   KeyValue("Errors", e) ]
 
 
         msg = DiagnosticArray()
@@ -126,7 +176,7 @@ def ntp_monitor_main(argv=sys.argv):
     parser.add_option("--error-offset-tolerance", dest="error_offset_tol",
                       action="store", default=5000000,
                       help="Offset from NTP host. Above this is error", metavar="OFFSET-TOL")
-    parser.add_option("--self_offset-tolerance", dest="self_offset_tol", 
+    parser.add_option("--self_offset-tolerance", dest="self_offset_tol",
                       action="store", default=500,
                       help="Offset from self", metavar="SELF_OFFSET-TOL")
     parser.add_option("--diag-hostname", dest="diag_hostname",
@@ -144,7 +194,7 @@ def ntp_monitor_main(argv=sys.argv):
         self_offset = int(options.self_offset_tol)
         error_offset = int(options.error_offset_tol)
     except:
-        parser.error("Offsets must be numbers")        
+        parser.error("Offsets must be numbers")
 
     ntp_monitor(offset, self_offset, options.diag_hostname, error_offset)
 
