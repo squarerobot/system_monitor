@@ -193,39 +193,39 @@ class NetMonitor():
           value = iface_name
         ))
         values.append(KeyValue(
-          key = 'State',
+          key = iface_name + ' State',
           value = iface_state
         ))
         values.append(KeyValue(
-          key = 'Input Traffic',
+          key = iface_name + ' Input Traffic',
           value = str(iface_upload_speed) + " (MB/s)"
         ))
         values.append(KeyValue(
-          key = 'Output Traffic',
+          key = iface_name + ' Output Traffic',
           value = str(iface_down_speed) + " (MB/s)"
         ))
         values.append(KeyValue(
-          key = 'MTU',
+          key = iface_name + ' MTU',
           value = str(iface_mtu)
         ))
         values.append(KeyValue(
-          key = 'Total received MB',
+          key = iface_name + ' Total received MB',
           value = str(iface_total_rx)
         ))
         values.append(KeyValue(
-          key = 'Total transmitted MB',
+          key = iface_name + ' Total transmitted MB',
           value = str(iface_total_tx)
         ))
         values.append(KeyValue(
-          key = 'Collisions',
+          key = iface_name + ' Collisions',
           value = str(iface_col)
         ))
         values.append(KeyValue(
-          key = 'Rx Errors',
+          key = iface_name + ' Rx Errors',
           value = str(iface_error_in)
         ))
         values.append(KeyValue(
-          key = 'Tx Errors',
+          key = iface_name + ' Tx Errors',
           value = str(iface_error_out)
         ))
 
