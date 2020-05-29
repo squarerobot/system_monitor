@@ -53,6 +53,8 @@ def ntp_monitor(offset=500, self_offset=500, diag_hostname = None, error_offset 
     pub = rospy.Publisher("/diagnostics", DiagnosticArray, queue_size = 100)
     rospy.init_node(NAME, anonymous=True)
 
+    rate = rospy.Rate(0.2)
+
     hostname = socket.gethostname()
     if diag_hostname is None:
         diag_hostname = hostname
@@ -133,7 +135,7 @@ def ntp_monitor(offset=500, self_offset=500, diag_hostname = None, error_offset 
         msg.header.stamp = rospy.get_rostime()
         msg.status = [stat]
         pub.publish(msg)
-        time.sleep(5)
+        rate.sleep()
 
 def ntp_monitor_main(argv=sys.argv):
     import optparse
