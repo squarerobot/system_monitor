@@ -165,7 +165,7 @@ def ntp_monitor(offset=500, self_offset=500, diag_hostname = None, error_offset 
         msg.header.stamp = rospy.get_rostime()
         msg.status = [stat]
         pub.publish(msg)
-        time.sleep(1)
+        time.sleep(5)
 
 def ntp_monitor_main(argv=sys.argv):
     import optparse
