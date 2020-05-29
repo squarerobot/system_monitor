@@ -18,7 +18,7 @@ mem_monitor:
   mem_level_error: 0.99
 ntp_monitor:
   reference_host: ntp.ubuntu.com
-  offset_tolerance: 500.0
+  offset_tolerance: 10000.0
   error_offset_tolerance: 5000000.0
 net_monitor:
   net_level_warn: 0.95
