@@ -22,22 +22,81 @@ class Monitor():
         self._diag_net.message = status.message
         self._diag_net.hardware_id = status.hardware_id
         net_status = NetStatus()
-        net_status.status = status.values[0].value
-        net_status.time = float(status.values[1].value)
-        ifaces = (len(status.values) - 2) / 10
-        for i in xrange(0, ifaces):
-            inter = Interface()
-            inter.name = status.values[2+10*i].value
-            inter.state = status.values[3+10*i].value
-            inter.input = float(status.values[4+10*i].value[:-6])
-            inter.output = float(status.values[5+10*i].value[:-6])
-            inter.mtu = int(status.values[6+10*i].value)
-            inter.received = float(status.values[7+10*i].value)
-            inter.transmitted = float(status.values[8+10*i].value)
-            inter.collisions = int(status.values[9+10*i].value)
-            inter.rxError = int(status.values[10+10*i].value)
-            inter.txError = int(status.values[11+10*i].value)
-            net_status.interfaces.append(inter)
+        first_interface = True
+        for item in status.values:
+            key = item.key
+            value = item.value
+            if key == 'Update Status':
+                continue
+            if key == 'Time Since Update':
+                net_status.time = float(value)
+                continue
+            if key == 'Interface Name':
+                if first_interface:
+                    first_interface = False
+                else:
+                    net_status.interfaces.append(inter)
+                inter = Interface()
+                inter.name = value
+                continue
+            if inter.name not in key:
+                continue
+            key_pattern = inter.name + ' State'
+            if key_pattern == key:
+                inter.state = value
+                continue
+            key_pattern = inter.name + ' Input Traffic'
+            if key_pattern == key:
+                value = value.split(' ')
+                inter.input = float(value[0])
+                continue
+            key_pattern = inter.name + ' Output Traffic'
+            if key_pattern == key:
+                value = value.split(' ')
+                inter.output = float(value[0])
+                continue
+            key_pattern = inter.name + ' MTU'
+            if key_pattern == key:
+                inter.mtu = int(value)
+                continue
+            key_pattern = inter.name + ' Total received MB'
+            if key_pattern == key:
+                inter.received = float(value)
+                continue
+            key_pattern = inter.name + ' Total transmitted MB'
+            if key_pattern == key:
+                inter.transmitted = float(value)
+                continue
+            key_pattern = inter.name + ' Collisions'
+            if key_pattern == key:
+                inter.transmitted = int(value)
+                continue
+            key_pattern = inter.name + ' Rx Errors'
+            if key_pattern == key:
+                inter.rxError = int(value)
+                continue
+            key_pattern = inter.name + ' Tx Errors'
+            if key_pattern == key:
+                inter.txError = int(value)
+                continue
+        net_status.interfaces.append(inter)
+
+        # net_status.status = status.values[0].value
+        # net_status.time = float(status.values[1].value)
+        # ifaces = (len(status.values) - 2) / 10
+        # for i in xrange(0, ifaces):
+        #     inter = Interface()
+        #     inter.name = status.values[2+10*i].value
+        #     inter.state = status.values[3+10*i].value
+        #     inter.input = float(status.values[4+10*i].value[:-6])
+        #     inter.output = float(status.values[5+10*i].value[:-6])
+        #     inter.mtu = int(status.values[6+10*i].value)
+        #     inter.received = float(status.values[7+10*i].value)
+        #     inter.transmitted = float(status.values[8+10*i].value)
+        #     inter.collisions = int(status.values[9+10*i].value)
+        #     inter.rxError = int(status.values[10+10*i].value)
+        #     inter.txError = int(status.values[11+10*i].value)
+        #     net_status.interfaces.append(inter)
         self._diag_net.status = net_status
         self.publish_info()
 
