@@ -70,13 +70,6 @@ def ntp_monitor(offset=500, self_offset=500, diag_hostname = None, error_offset 
     stat.hardware_id = hostname
     stat.values = []
 
-#    self_stat = DiagnosticStatus()
-#    self_stat.level = DiagnosticStatus.OK
-#    self_stat.name = "NTP self-offset for "+ diag_hostname
-#    self_stat.message = "OK"
-#    self_stat.hardware_id = hostname
-#    self_stat.values = []
-
     ntp_obj = ntplib.NTPClient()
 
     while not rospy.is_shutdown():
@@ -154,9 +147,6 @@ def ntp_monitor_main(argv=sys.argv):
                       metavar="DIAG_HOSTNAME",
                       action="store", default=None)
     options, args = parser.parse_args(rospy.myargv())
-
-#    if (len(args) != 2):
-#        parser.error("Invalid arguments. Must have HOSTNAME [args]. %s" % args)
 
 
     try:
