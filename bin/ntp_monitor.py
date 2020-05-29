@@ -41,7 +41,6 @@ from diagnostic_msgs.msg import DiagnosticArray, DiagnosticStatus, KeyValue
 import sys
 import rospy
 import socket
-from subprocess import Popen, PIPE
 import ntplib
 
 import time
@@ -80,12 +79,7 @@ def ntp_monitor(offset=500, self_offset=500, diag_hostname = None, error_offset 
 
     while not rospy.is_shutdown():
         try:
-            # p = Popen(["ntpdate", "-q", host], stdout=PIPE, stdin=PIPE, stderr=PIPE)
-            # res = p.wait()
-            # (o,e) = p.communicate()
-            print("hola")
             ntp_response = ntp_obj.request(ntp_hostname, version=3)
-            print("adios")
             measured_offset = ntp_response.offset * 1000000
             stat.level = DiagnosticStatus.OK
             stat.message = "OK"
@@ -133,31 +127,6 @@ def ntp_monitor(offset=500, self_offset=500, diag_hostname = None, error_offset 
                     value =str(error_offset)
                 ),
             ]
-
-
-            # if (res == 0):
-            #     measured_offset = float(re.search("offset (.*),", o).group(1))*1000000
-            #     st.level = DiagnosticStatus.OK
-            #     st.message = "OK"
-            #     st.values = [ KeyValue("Offset (us)", str(measured_offset)),
-            #                   KeyValue("Offset tolerance (us)", str(off)),
-            #                   KeyValue("Offset tolerance (us) for Error", str(error_offset)) ]
-
-            #     if (abs(measured_offset) > off):
-            #         st.level = DiagnosticStatus.WARN
-            #         st.message = "NTP Offset Too High"
-            #     if (abs(measured_offset) > error_offset):
-            #         st.level = DiagnosticStatus.ERROR
-            #         st.message = "NTP Offset Too High"
-
-            # else:
-            #     st.level = DiagnosticStatus.ERROR
-            #     st.message = "Error Running ntpdate. Returned %d" % res
-            #     st.values = [ KeyValue("Offset (us)", "N/A"),
-            #                   KeyValue("Offset tolerance (us)", str(off)),
-            #                   KeyValue("Offset tolerance (us) for Error", str(error_offset)),
-            #                   KeyValue("Output", o),
-            #                   KeyValue("Errors", e) ]
 
 
         msg = DiagnosticArray()
