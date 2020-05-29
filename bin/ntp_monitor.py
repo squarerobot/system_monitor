@@ -78,62 +78,61 @@ def ntp_monitor(offset=500, self_offset=500, diag_hostname = None, error_offset 
 
     ntp_obj = ntplib.NTPClient()
 
-
     while not rospy.is_shutdown():
-        for st,host,off in [(stat,ntp_hostname,offset)]:
-            try:
-                # p = Popen(["ntpdate", "-q", host], stdout=PIPE, stdin=PIPE, stderr=PIPE)
-                # res = p.wait()
-                # (o,e) = p.communicate()
-                ntp_response = ntp_obj.request(host, version=3)
-                measured_offset = ntp_response.offset * 1000000
-                st.level = DiagnosticStatus.OK
-                st.message = "OK"
-                st.values = [
-                    KeyValue(
-                        key = "Offset (us)",
-                        value = str(measured_offset)
-                    ),
-                    KeyValue(
-                        key = "Offset tolerance (us)",
-                        value = str(off)
-                    ),
-                    KeyValue(
-                        key = "Offset tolerance (us) for Error",
-                        value = str(error_offset)
-                    ),
-                ]
+        try:
+            # p = Popen(["ntpdate", "-q", host], stdout=PIPE, stdin=PIPE, stderr=PIPE)
+            # res = p.wait()
+            # (o,e) = p.communicate()
+            print("hola")
+            ntp_response = ntp_obj.request(ntp_hostname, version=3)
+            print("adios")
+            measured_offset = ntp_response.offset * 1000000
+            stat.level = DiagnosticStatus.OK
+            stat.message = "OK"
+            stat.values = [
+                KeyValue(
+                    key = "Offset (us)",
+                    value = str(measured_offset)
+                ),
+                KeyValue(
+                    key = "Offset tolerance (us)",
+                    value = str(offset)
+                ),
+                KeyValue(
+                    key = "Offset tolerance (us) for Error",
+                    value = str(error_offset)
+                ),
+            ]
 
-                if (abs(measured_offset) > off):
-                    st.level = DiagnosticStatus.WARN
-                    st.message = "NTP Offset Too High"
-                if (abs(measured_offset) > error_offset):
-                    st.level = DiagnosticStatus.ERROR
-                    st.message = "NTP Offset Too High"
+            if (abs(measured_offset) > offset):
+                stat.level = DiagnosticStatus.WARN
+                stat.message = "NTP Offset Too High"
+            if (abs(measured_offset) > error_offset):
+                stat.level = DiagnosticStatus.ERROR
+                stat.message = "NTP Offset Too High"
 
-            except OSError, (errno, msg):
-                if errno == 4:
-                    break #ctrl-c interrupt
-                else:
-                    raise
-
-            except Exception, e:
-                st.level = DiagnosticStatus.ERROR
-                st.message = "Error Running ntpdate"
-                st.values = [
-                    KeyValue(
-                        key = "Offset (us)",
-                        value ="N/A"
-                    ),
-                    KeyValue(
-                        key = "Offset tolerance (us)",
-                                value =str(off)
-                    ),
-                    KeyValue(
-                        key = "Offset tolerance (us) for Error",
-                        value =str(error_offset)
-                    ),
-                ]
+        except OSError, (errno, msg):
+            if errno == 4:
+                break #ctrl-c interrupt
+            else:
+                raise
+        except Exception, e:
+            stat.level = DiagnosticStatus.ERROR
+            stat.message = "Error Running ntpdate"
+            stat.values = [
+                KeyValue(
+                    key = "Offset (us)",
+                    value ="N/A"
+                ),
+                KeyValue(
+                    key = "Offset tolerance (us)",
+                            value =str(offset)
+                ),
+                KeyValue(
+                    key = "Offset tolerance (us) for Error",
+                    value =str(error_offset)
+                ),
+            ]
 
 
             # if (res == 0):
