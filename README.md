@@ -39,6 +39,7 @@ git checkout psutil
 
 ### Requirements
 * catkin-pip
+* diagnostic_msgs
 * psutil >= 5.7.0 (installed through catkin-pip on build)
 * ntplib >= 0.3.4 (installed through catkin-pip on build)
 
