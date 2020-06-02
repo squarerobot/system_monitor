@@ -5,6 +5,7 @@ find_package(catkin REQUIRED COMPONENTS
   rospy
   std_msgs
   catkin_pip
+  diagnostic_msgs
   message_generation)
 
 # catkin_pip_setup()
@@ -23,12 +24,14 @@ add_message_files(
    DiagnosticHDD.msg
    DiagnosticMEM.msg
    DiagnosticNET.msg
+   DiagnosticNTP.msg
    Disk.msg
    HDDStatus.msg
    Interface.msg
    Memory.msg
    MEMStatus.msg
    NetStatus.msg
+   NTPStatus.msg
 )
 
 generate_messages(
@@ -38,7 +41,9 @@ generate_messages(
 )
 
 catkin_package(
-  CATKIN_DEPENDS rospy message_runtime
+  CATKIN_DEPENDS
+    rospy
+    message_runtime
 )
 
 include_directories(
@@ -58,6 +63,6 @@ install(PROGRAMS
 
 
 install(
-  DIRECTORY bin config launch
+  DIRECTORY config launch
   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
 )
