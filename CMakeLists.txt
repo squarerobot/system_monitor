@@ -9,8 +9,8 @@ find_package(catkin REQUIRED COMPONENTS
   message_generation)
 
 # catkin_pip_setup()
-catkin_pip_requirements(${CMAKE_CURRENT_SOURCE_DIR}/pip.txt)
-catkin_pip_requirements(${CMAKE_CURRENT_SOURCE_DIR}/requirements.txt)
+#catkin_pip_requirements(${CMAKE_CURRENT_SOURCE_DIR}/pip.txt)
+#catkin_pip_requirements(${CMAKE_CURRENT_SOURCE_DIR}/requirements.txt)
 
 add_message_files(
    FILES
