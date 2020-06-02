@@ -26,8 +26,7 @@ following ROS nodes:
 Each node publishes ROS diagnostics which can conveniently be visualized
 in the runtime monitor.
 
-In this branch uses pure python functions, no external system packages are required. The required modules are installed locally using catkin-pip
-
+In this branch uses pure python functions, no external system packages are required.
 ## Installation
 
 Download the repository in the src folder of your worksapce:
@@ -38,10 +37,16 @@ git checkout psutil
 ```
 
 ### Requirements
-* catkin-pip
 * diagnostic_msgs
-* psutil >= 5.7.0 (installed through catkin-pip on build)
-* ntplib >= 0.3.4 (installed through catkin-pip on build)
+* psutil >= 5.7.0
+* ntplib >= 0.3.4
+
+
+### Installl required packages
+```bash
+sudo pip2 install --upgrade pip
+sudo pip2 install -r requirements.txt
+```
 
 ## Usage
 Use the launch file in order to run the node:

@@ -4,7 +4,7 @@ project(system_monitor)
 find_package(catkin REQUIRED COMPONENTS
   rospy
   std_msgs
-  catkin_pip
+  # catkin_pip
   diagnostic_msgs
   message_generation)
 
