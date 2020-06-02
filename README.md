@@ -31,13 +31,9 @@ in the runtime monitor.
 ## Installation
 
 Download the repository in the src folder of your worksapce:
- 
-  ```
-  git clone https://github.com/RobotnikAutomation/system_monitor    
-  ```
 
-Keep in mind that this package has some dependencies. If you do not have them, you will have to install them:
+```bash
+git clone https://github.com/RobotnikAutomation/system_monitor
+git checkout psutil
+```
 
-  ```
-  sudo apt-get install sysstat ifstat ntpdate
-  ```
