@@ -12,8 +12,6 @@ System monitoring tools for ROS.
 
 **Operating system(s):** Debian-based Linux
 
-**Package PPA:** ppa:ethz-asl/ros
-
 ## Description
 
 This project provides system monitoring tools for ROS in the form of the
@@ -28,6 +26,8 @@ following ROS nodes:
 Each node publishes ROS diagnostics which can conveniently be visualized
 in the runtime monitor.
 
+In this branch uses pure python functions, no external system packages are required. The required modules are installed locally using catkin-pip
+
 ## Installation
 
 Download the repository in the src folder of your worksapce:
@@ -36,4 +36,27 @@ Download the repository in the src folder of your worksapce:
 git clone https://github.com/RobotnikAutomation/system_monitor
 git checkout psutil
 ```
+
+### Requirements
+* catkin-pip
+* psutil >= 5.7.0 (installed through catkin-pip on build)
+* ntplib >= 0.3.4 (installed through catkin-pip on build)
+
+## Usage
+Use the launch file in order to run the node:
+
+```bash
+roslaunch system_monitor system_monitor.launch
+```
+
+### Optional arguments
+
+| Argument       | Environment variable | Meaning                     | Default value |
+| -------------- | -------------------- | --------------------------- | ------------- |
+| `machine_name` | `HOSTNAME`           | Machine name                | `localhost`   |
+| `launch_cpu`   | `SYS_MON_LAUNCH_CPU` | Launch the CPU monitor node | `true`        |
+| `launch_hdd`   | `SYS_MON_LAUNCH_HDD` | Launch the Hard Drive monitor node | `true`        |
+| `launch_mem`   | `SYS_MON_LAUNCH_MEM` | Launch the RAM memory monitor node | `true`        |
+| `launch_ntp`   | `SYS_MON_LAUNCH_NTP` | Launch the NTP monitor node | `true`        |
+| `launch_net`   | `SYS_MON_LAUNCH_NET` | Launch the Network monitor node | `true`        |
 
