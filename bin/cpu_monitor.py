@@ -485,9 +485,8 @@ class CPUMonitor():
             self._usage_stat.values = diag_vals
 
             self._usage_stat.message = usage_msg
-
             if not rospy.is_shutdown():
-                self._usage_timer = threading.Timer(5.0, self.check_usage)
+                self._usage_timer = threading.Timer(2.0, self.check_usage)
                 self._usage_timer.start()
             else:
                 self.cancel_timers()

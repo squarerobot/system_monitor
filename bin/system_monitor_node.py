@@ -39,7 +39,7 @@ class Monitor():
     		inter.txError = int(status.values[11+10*i].value)
     		net_status.interfaces.append(inter)
     	self._diag_net.status = net_status
-    	self.publish_info()
+    	#self.publish_info()
 
     #Update memory values
     def update_mem_values(self, status):
@@ -65,7 +65,7 @@ class Monitor():
     	mem.free = int(status.values[7].value[:-1])
     	mem_status.memories.append(mem)
     	self._diag_mem.status = mem_status
-    	self.publish_info()
+    	#self.publish_info()
 
     #Update cpu_temp values
     def update_cpu_temp_values(self, status):
@@ -84,7 +84,7 @@ class Monitor():
                 core.temp = -1
             aux_temp.cores.append(core)
         self._diag_cpu_temp.status = aux_temp
-        self.publish_info()
+        #self.publish_info()
 
     #Update cpu_usage values
     def update_cpu_usa_values(self, status):
@@ -111,7 +111,7 @@ class Monitor():
     		core.idle = float(status.values[6 + num_cores + 5*i].value[:-1].replace(",","."))
     		aux_usa.cores.append(core)
     	self._diag_cpu_usa.status = aux_usa
-    	self.publish_info()
+    	#self.publish_info()
 
     #Update hdd values
     def update_hdd_values(self, status):
@@ -134,7 +134,7 @@ class Monitor():
     		disk.mount_point = status.values[8 + i * 6].value
     		aux_stat.disks.append(disk)
     	self._diag_hdd.status = aux_stat
-    	self.publish_info()
+    	#self.publish_info()
 
     #Publish info
     def publish_info(self):
@@ -144,26 +144,26 @@ class Monitor():
     	msg.diagCpuTemp = self._diag_cpu_temp
     	msg.diagCpuUsage = self._diag_cpu_usa
     	msg.diagHdd = self._diag_hdd
-    	self._rate.sleep()
+    	#self._rate.sleep()
     	self._pub.publish(msg)
 
 
 # Print CPU status
 def callback(data):
-	if data.status[0].name.startswith('Memory'):
-		#Extract useful data from memory
-		mon.update_mem_values(data.status[0])
-	elif data.status[0].name.startswith('Network'):
-		#Extract useful data from network
-		mon.update_net_values(data.status[0])
-	elif data.status[0].name.startswith('CPU Temperature'):
-		#Extract useful data from cpu
-		mon.update_cpu_temp_values(data.status[0])
-		mon.update_cpu_usa_values(data.status[1])
-	elif data.status[0].name.startswith("HDD Usage"):
-		#Extract useful data from disk
-		mon.update_hdd_values(data.status[0])
-
+    if data.status[0].name.startswith('Memory'):
+    	#Extract useful data from memory
+    	mon.update_mem_values(data.status[0])
+    elif data.status[0].name.startswith('Network'):
+    	#Extract useful data from network
+    	mon.update_net_values(data.status[0])
+    elif data.status[0].name.startswith('CPU Temperature'):
+        mon.update_cpu_temp_values(data.status[0])
+    #elif data.status[0].name.startswith('CPU Usage'):
+        mon.update_cpu_usa_values(data.status[1])
+    elif data.status[0].name.startswith("HDD Usage"):
+        #Extract useful data from disk
+        mon.update_hdd_values(data.status[0])
+    mon.publish_info()
 
 if __name__ == '__main__':
 	rospy.init_node('system_monitor_node')
