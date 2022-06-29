@@ -50,8 +50,9 @@ import re
 
 NAME = 'ntp_monitor'
 
-def ntp_monitor(offset=500, self_offset=500, diag_hostname = None, error_offset = 5000000):
-    pub = rospy.Publisher("/diagnostics", DiagnosticArray, queue_size = 100)
+
+def ntp_monitor(offset=500, self_offset=500, diag_hostname=None, error_offset=5000000):
+    pub = rospy.Publisher("/diagnostics", DiagnosticArray, queue_size=100)
     rospy.init_node(NAME, anonymous=True)
 
     hostname = socket.gethostname()
@@ -64,37 +65,39 @@ def ntp_monitor(offset=500, self_offset=500, diag_hostname = None, error_offset 
 
     stat = DiagnosticStatus()
     stat.level = 0
-    stat.name = "NTP offset from "+ diag_hostname + " to " + ntp_hostname
+    stat.name = "NTP offset from " + diag_hostname + " to " + ntp_hostname
     stat.message = "OK"
     stat.hardware_id = hostname
     stat.values = []
 
-#    self_stat = DiagnosticStatus()
-#    self_stat.level = DiagnosticStatus.OK
-#    self_stat.name = "NTP self-offset for "+ diag_hostname
-#    self_stat.message = "OK"
-#    self_stat.hardware_id = hostname
-#    self_stat.values = []
+    #    self_stat = DiagnosticStatus()
+    #    self_stat.level = DiagnosticStatus.OK
+    #    self_stat.name = "NTP self-offset for "+ diag_hostname
+    #    self_stat.message = "OK"
+    #    self_stat.hardware_id = hostname
+    #    self_stat.values = []
 
     while not rospy.is_shutdown():
-        for st,host,off in [(stat,ntp_hostname,offset)]:
+        for st, host, off in [(stat, ntp_hostname, offset)]:
             try:
                 p = Popen(["ntpdate", "-q", host], stdout=PIPE, stdin=PIPE, stderr=PIPE)
                 res = p.wait()
-                (o,e) = p.communicate()
+                (o, e) = p.communicate()
             except OSError as xxx_todo_changeme:
                 (errno, msg) = xxx_todo_changeme.args
                 if errno == 4:
-                    break #ctrl-c interrupt
+                    break  #ctrl-c interrupt
                 else:
                     raise
             if (res == 0):
-                measured_offset = float(re.search("offset (.*),", o).group(1))*1000000
+                measured_offset = float(re.search("offset (.*),", o).group(1)) * 1000000
                 st.level = DiagnosticStatus.OK
                 st.message = "OK"
-                st.values = [ KeyValue("Offset (us)", str(measured_offset)),
-                              KeyValue("Offset tolerance (us)", str(off)),
-                              KeyValue("Offset tolerance (us) for Error", str(error_offset)) ]
+                st.values = [
+                    KeyValue("Offset (us)", str(measured_offset)),
+                    KeyValue("Offset tolerance (us)", str(off)),
+                    KeyValue("Offset tolerance (us) for Error", str(error_offset))
+                ]
 
                 if (abs(measured_offset) > off):
                     st.level = DiagnosticStatus.WARN
@@ -106,12 +109,13 @@ def ntp_monitor(offset=500, self_offset=500, diag_hostname = None, error_offset 
             else:
                 st.level = DiagnosticStatus.ERROR
                 st.message = "Error Running ntpdate. Returned %d" % res
-                st.values = [ KeyValue("Offset (us)", "N/A"),
-                              KeyValue("Offset tolerance (us)", str(off)),
-                              KeyValue("Offset tolerance (us) for Error", str(error_offset)),
-                              KeyValue("Output", o),
-                              KeyValue("Errors", e) ]
-
+                st.values = [
+                    KeyValue("Offset (us)", "N/A"),
+                    KeyValue("Offset tolerance (us)", str(off)),
+                    KeyValue("Offset tolerance (us) for Error", str(error_offset)),
+                    KeyValue("Output", o),
+                    KeyValue("Errors", e)
+                ]
 
         msg = DiagnosticArray()
         msg.header.stamp = rospy.get_rostime()
@@ -119,34 +123,49 @@ def ntp_monitor(offset=500, self_offset=500, diag_hostname = None, error_offset 
         pub.publish(msg)
         time.sleep(1)
 
+
 def ntp_monitor_main(argv=sys.argv):
     import optparse
     parser = optparse.OptionParser(usage="usage: ntp_monitor ntp-hostname []")
-    parser.add_option("--offset-tolerance", dest="offset_tol",
-                      action="store", default=500,
-                      help="Offset from NTP host", metavar="OFFSET-TOL")
-    parser.add_option("--error-offset-tolerance", dest="error_offset_tol",
-                      action="store", default=5000000,
-                      help="Offset from NTP host. Above this is error", metavar="OFFSET-TOL")
-    parser.add_option("--self_offset-tolerance", dest="self_offset_tol", 
-                      action="store", default=500,
-                      help="Offset from self", metavar="SELF_OFFSET-TOL")
-    parser.add_option("--diag-hostname", dest="diag_hostname",
-                      help="Computer name in diagnostics output (ex: 'c1')",
-                      metavar="DIAG_HOSTNAME",
-                      action="store", default=None)
+    parser.add_option(
+        "--offset-tolerance",
+        dest="offset_tol",
+        action="store",
+        default=500,
+        help="Offset from NTP host",
+        metavar="OFFSET-TOL")
+    parser.add_option(
+        "--error-offset-tolerance",
+        dest="error_offset_tol",
+        action="store",
+        default=5000000,
+        help="Offset from NTP host. Above this is error",
+        metavar="OFFSET-TOL")
+    parser.add_option(
+        "--self_offset-tolerance",
+        dest="self_offset_tol",
+        action="store",
+        default=500,
+        help="Offset from self",
+        metavar="SELF_OFFSET-TOL")
+    parser.add_option(
+        "--diag-hostname",
+        dest="diag_hostname",
+        help="Computer name in diagnostics output (ex: 'c1')",
+        metavar="DIAG_HOSTNAME",
+        action="store",
+        default=None)
     options, args = parser.parse_args(rospy.myargv())
 
-#    if (len(args) != 2):
-#        parser.error("Invalid arguments. Must have HOSTNAME [args]. %s" % args)
-
+    #    if (len(args) != 2):
+    #        parser.error("Invalid arguments. Must have HOSTNAME [args]. %s" % args)
 
     try:
         offset = int(options.offset_tol)
         self_offset = int(options.self_offset_tol)
         error_offset = int(options.error_offset_tol)
     except:
-        parser.error("Offsets must be numbers")        
+        parser.error("Offsets must be numbers")
 
     ntp_monitor(offset, self_offset, options.diag_hostname, error_offset)
 
@@ -154,8 +173,10 @@ def ntp_monitor_main(argv=sys.argv):
 if __name__ == "__main__":
     try:
         ntp_monitor_main(rospy.myargv())
-    except KeyboardInterrupt: pass
-    except SystemExit: pass
+    except KeyboardInterrupt:
+        pass
+    except SystemExit:
+        pass
     except:
         import traceback
         traceback.print_exc()
