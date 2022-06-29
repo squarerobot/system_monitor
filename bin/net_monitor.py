@@ -39,7 +39,13 @@
 ############################################################################
 
 from __future__ import with_statement
+from __future__ import division
+from __future__ import print_function
 
+from builtins import str
+from builtins import range
+from builtins import object
+from past.utils import old_div
 import rospy
 
 import traceback
@@ -99,7 +105,7 @@ def get_sys_net(iface, sys):
   stdout, stderr = p.communicate()
   return (p.returncode, stdout.strip())
 
-class NetMonitor():
+class NetMonitor(object):
   def __init__(self, hostname, diag_hostname):
     self._diag_pub = rospy.Publisher('/diagnostics', DiagnosticArray, queue_size = 100)
     self._mutex = threading.Lock()
@@ -161,8 +167,8 @@ class NetMonitor():
           value = str(float(kb_in[i]) / 1024) + " (MB/s)"))
         values.append(KeyValue(key = 'Output Traffic',
           value = str(float(kb_out[i]) / 1024) + " (MB/s)"))
-        net_usage_in = float(kb_in[i]) / 1024 / self._net_capacity
-        net_usage_out = float(kb_out[i]) / 1024 / self._net_capacity
+        net_usage_in = old_div(float(kb_in[i]) / 1024, self._net_capacity)
+        net_usage_out = old_div(float(kb_out[i]) / 1024, self._net_capacity)
         if net_usage_in > self._net_level_warn or\
           net_usage_out > self._net_level_warn:
           level = DiagnosticStatus.WARN
@@ -172,11 +178,11 @@ class NetMonitor():
         (retcode, cmd_out) = get_sys_net_stat(ifaces[i], 'rx_bytes')
         if retcode == 0:
           values.append(KeyValue(key = 'Total received MB',
-            value = str(float(cmd_out) / 1024 / 1024)))
+            value = str(old_div(float(cmd_out) / 1024, 1024))))
         (retcode, cmd_out) = get_sys_net_stat(ifaces[i], 'tx_bytes')
         if retcode == 0:
           values.append(KeyValue(key = 'Total transmitted MB',
-            value = str(float(cmd_out) / 1024 / 1024)))
+            value = str(old_div(float(cmd_out) / 1024, 1024))))
         (retcode, cmd_out) = get_sys_net_stat(ifaces[i], 'collisions')
         if retcode == 0:
           values.append(KeyValue(key = 'Collisions', value = cmd_out))
@@ -186,7 +192,7 @@ class NetMonitor():
         (retcode, cmd_out) = get_sys_net_stat(ifaces[i], 'tx_errors')
         if retcode == 0:
           values.append(KeyValue(key = 'Tx Errors', value = cmd_out))
-    except Exception, e:
+    except Exception as e:
       rospy.logerr(traceback.format_exc())
       msg = 'Network Usage Check Error'
       values.append(KeyValue(key = msg, value = str(e)))
@@ -248,8 +254,7 @@ if __name__ == '__main__':
   try:
     rospy.init_node('net_monitor_%s' % hostname)
   except rospy.exceptions.ROSInitException:
-    print >> sys.stderr,\
-      'Network monitor is unable to initialize node. Master may not be running.'
+    print('Network monitor is unable to initialize node. Master may not be running.', file=sys.stderr)
     sys.exit(0)
   net_node = NetMonitor(hostname, options.diag_hostname)
   rate = rospy.Rate(1.0)
@@ -259,7 +264,7 @@ if __name__ == '__main__':
       net_node.publish_stats()
   except KeyboardInterrupt:
     pass
-  except Exception, e:
+  except Exception as e:
     traceback.print_exc()
     rospy.logerr(traceback.format_exc())
   net_node.cancel_timers()

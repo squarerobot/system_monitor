@@ -38,6 +38,10 @@
 #    POSSIBILITY OF SUCH DAMAGE.                                           #
 ############################################################################
 
+from __future__ import print_function
+from builtins import str
+from builtins import range
+from builtins import object
 from __future__ import with_statement
 
 import rospy
@@ -131,7 +135,7 @@ def update_status_stale(stat, last_update_time):
     stat.values.insert(0, KeyValue(key = 'Update Status', value = stale_status))
     stat.values.insert(1, KeyValue(key = 'Time Since Update', value = str(time_since_update)))
 
-class hdd_monitor():
+class hdd_monitor(object):
     def __init__(self, hostname, diag_hostname):
         self._mutex = threading.Lock()
 
@@ -195,10 +199,10 @@ class hdd_monitor():
         for index in range(0, len(drives)):
             temp = temps[index]
             
-            if not unicode(temp).isnumeric() and drives[index] not in REMOVABLE:
+            if not str(temp).isnumeric() and drives[index] not in REMOVABLE:
                 temp_level = DiagnosticStatus.ERROR
                 temp_ok = False
-            elif not unicode(temp).isnumeric() and drives[index] in REMOVABLE:
+            elif not str(temp).isnumeric() and drives[index] in REMOVABLE:
                 temp_level = DiagnosticStatus.OK
                 temp = "Removed"
             else:
@@ -262,7 +266,7 @@ class hdd_monitor():
                 for row in rows:
                     if len(row.split()) < 2:
                         continue
-                    if unicode(row.split()[0]) == "none":
+                    if str(row.split()[0]) == "none":
                         continue
 
                     row_count += 1
@@ -361,7 +365,7 @@ if __name__ == '__main__':
     try:
         rospy.init_node('hdd_monitor_%s' % hostname)
     except rospy.exceptions.ROSInitException:
-        print 'HDD monitor is unable to initialize node. Master may not be running.'
+        print('HDD monitor is unable to initialize node. Master may not be running.')
         sys.exit(0)
         
     hdd_monitor = hdd_monitor(hostname, options.diag_hostname)
@@ -373,7 +377,7 @@ if __name__ == '__main__':
             hdd_monitor.publish_stats()
     except KeyboardInterrupt:
         pass
-    except Exception, e:
+    except Exception as e:
         traceback.print_exc()
 
     hdd_monitor.cancel_timers()

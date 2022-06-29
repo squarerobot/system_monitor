@@ -36,6 +36,7 @@
 #    POSSIBILITY OF SUCH DAMAGE.                                           #
 ############################################################################
 
+from builtins import str
 from diagnostic_msgs.msg import DiagnosticArray, DiagnosticStatus, KeyValue
 
 import sys
@@ -81,7 +82,8 @@ def ntp_monitor(offset=500, self_offset=500, diag_hostname = None, error_offset 
                 p = Popen(["ntpdate", "-q", host], stdout=PIPE, stdin=PIPE, stderr=PIPE)
                 res = p.wait()
                 (o,e) = p.communicate()
-            except OSError, (errno, msg):
+            except OSError as xxx_todo_changeme:
+                (errno, msg) = xxx_todo_changeme.args
                 if errno == 4:
                     break #ctrl-c interrupt
                 else:

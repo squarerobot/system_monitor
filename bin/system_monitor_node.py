@@ -1,10 +1,14 @@
 #! /usr/bin/env python
 
+from __future__ import division
+from builtins import range
+from builtins import object
+from past.utils import old_div
 import rospy
 from diagnostic_msgs.msg import DiagnosticArray
 from system_monitor.msg import *
 
-class Monitor():
+class Monitor(object):
 
     def __init__(self):
     	self._pub = rospy.Publisher('~diagnostics', Diagnostic, queue_size=1)
@@ -24,8 +28,8 @@ class Monitor():
     	net_status = NetStatus()
     	net_status.status = status.values[0].value
     	net_status.time = float(status.values[1].value)
-    	ifaces = (len(status.values) - 2) / 10
-    	for i in xrange(0, ifaces):
+    	ifaces = old_div((len(status.values) - 2), 10)
+    	for i in range(0, ifaces):
     		inter = Interface()
     		inter.name = status.values[2+10*i].value
     		inter.state = status.values[3+10*i].value
@@ -52,7 +56,7 @@ class Monitor():
     	mem_status.usedM = int(status.values[-2].value[:-1])
     	mem_status.freeM = int(status.values[-1].value[:-1])
     	names = ['Physical','Swap']
-    	for i in xrange(0, 2):
+    	for i in range(0, 2):
     		mem = Memory()
     		mem.name = names[i]
     		mem.total = int(status.values[3+5*i].value[:-1])
@@ -93,7 +97,7 @@ class Monitor():
     	self._diag_cpu_usa.hardware_id = status.hardware_id
     	aux_usa = CPUUsageStatus()
     	len_values = len(status.values)
-    	num_cores = (len_values - 6)/6
+    	num_cores = old_div((len_values - 6),6)
     	aux_usa.status = status.values[0].value
     	aux_usa.time = float(status.values[1].value)
     	aux_usa.load_status = status.values[len_values - 4].value
@@ -122,7 +126,7 @@ class Monitor():
     	aux_stat.status = status.values[0].value
     	aux_stat.time = float(status.values[1].value)
     	aux_stat.space_reading = status.values[2].value
-    	num_disks = (len(status.values) - 3)/6
+    	num_disks = old_div((len(status.values) - 3),6)
     	for i in range(0,num_disks):
     		disk = Disk()
     		disk.id = i + 1
