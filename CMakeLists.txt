@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.8.3)
+cmake_minimum_required(VERSION 3.0.2)
 project(system_monitor)
 
 find_package(catkin REQUIRED COMPONENTS
@@ -28,7 +28,7 @@ add_message_files(
 
 generate_messages(
    DEPENDENCIES
-   std_msgs  
+   std_msgs
    system_monitor # Or other packages containing msgs
 )
 
