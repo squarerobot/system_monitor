@@ -38,22 +38,18 @@
 #    POSSIBILITY OF SUCH DAMAGE.                                           #
 ############################################################################
 
-from __future__ import print_function
+from __future__ import (print_function, with_statement)
+
 from builtins import str
 from builtins import object
-from __future__ import with_statement
-
-import rospy
 
 import traceback
 import threading
-from threading import Timer
-import sys, os, time
-from time import sleep
+import sys
 import subprocess
-import string
-
 import socket
+
+import rospy
 
 from diagnostic_msgs.msg import DiagnosticArray, DiagnosticStatus, KeyValue
 
