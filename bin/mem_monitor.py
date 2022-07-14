@@ -128,6 +128,7 @@ class MemMonitor(object):
             p = subprocess.Popen(
                 'free -tm', stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
             stdout, stderr = p.communicate()
+            stdout = stdout.decode()
             retcode = p.returncode
 
             if retcode != 0:

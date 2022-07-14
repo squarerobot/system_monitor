@@ -186,6 +186,7 @@ class CPUMonitor(object):
             cmd = 'cat %s' % temp_str
             p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
             stdout, stderr = p.communicate()
+            stdout = stdout.decode()
             retcode = p.returncode
 
             if retcode != 0:
@@ -228,6 +229,7 @@ class CPUMonitor(object):
                 stderr=subprocess.PIPE,
                 shell=True)
             stdout, stderr = p.communicate()
+            stdout = stdout.decode()
             retcode = p.returncode
 
             if retcode != 0:
@@ -269,6 +271,7 @@ class CPUMonitor(object):
             p = subprocess.Popen(
                 'uptime', stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
             stdout, stderr = p.communicate()
+            stdout = stdout.decode()
             retcode = p.returncode
 
             if retcode != 0:
@@ -307,6 +310,7 @@ class CPUMonitor(object):
             p = subprocess.Popen(
                 'mpstat -P ALL 1 1', stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
             stdout, stderr = p.communicate()
+            stdout = stdout.decode()
             retcode = p.returncode
             if retcode != 0:
                 if not self._has_warned_mpstat:
@@ -404,6 +408,7 @@ class CPUMonitor(object):
                 stderr=subprocess.PIPE,
                 shell=True)
             stdout, stderr = p.communicate()
+            stdout = stdout.decode()
             retcode = p.returncode
 
             if retcode != 0:

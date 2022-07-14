@@ -95,6 +95,7 @@ def get_sys_net_stat(iface, sys):
     cmd = 'cat /sys/class/net/%s/statistics/%s' % (iface, sys)
     p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
     stdout, stderr = p.communicate()
+    stdout = stdout.decode()
     return (p.returncode, stdout.strip())
 
 
@@ -102,6 +103,7 @@ def get_sys_net(iface, sys):
     cmd = 'cat /sys/class/net/%s/%s' % (iface, sys)
     p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
     stdout, stderr = p.communicate()
+    stdout = stdout.decode()
     return (p.returncode, stdout.strip())
 
 
@@ -137,6 +139,7 @@ class NetMonitor(object):
             p = subprocess.Popen(
                 'ifstat -q -S 1 1', stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
             stdout, stderr = p.communicate()
+            stdout = stdout.decode()
             retcode = p.returncode
             if retcode == 3:
                 values.append(KeyValue(key="\"ifstat -q -S 1 1\" Call Error", value=str(retcode)))

@@ -266,6 +266,7 @@ class hdd_monitor(object):
             p = subprocess.Popen(
                 ["df", "-Pht", "ext4"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
             stdout, stderr = p.communicate()
+            stdout = stdout.decode()
             retcode = p.returncode
 
             if (retcode == 0 or retcode == 1):
