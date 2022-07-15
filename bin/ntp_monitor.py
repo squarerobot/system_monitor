@@ -40,6 +40,8 @@ from __future__ import unicode_literals
 from builtins import str
 from diagnostic_msgs.msg import DiagnosticArray, DiagnosticStatus, KeyValue
 
+from six import string_types
+
 import sys
 import rospy
 import socket

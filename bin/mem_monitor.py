@@ -43,6 +43,8 @@ from __future__ import unicode_literals
 from builtins import str
 from builtins import object
 
+from six import string_types
+
 import traceback
 import threading
 import sys
@@ -128,7 +130,8 @@ class MemMonitor(object):
             p = subprocess.Popen(
                 'free -tm', stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
             stdout, stderr = p.communicate()
-            stdout = stdout.decode()
+            if not isinstance(stdout, string_types):
+                stdout = stdout.decode()
             retcode = p.returncode
 
             if retcode != 0:

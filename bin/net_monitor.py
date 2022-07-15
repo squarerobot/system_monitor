@@ -47,6 +47,9 @@ from builtins import str
 from builtins import range
 from builtins import object
 from past.utils import old_div
+
+from six import string_types
+
 import rospy
 
 import traceback
@@ -95,7 +98,8 @@ def get_sys_net_stat(iface, sys):
     cmd = 'cat /sys/class/net/%s/statistics/%s' % (iface, sys)
     p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
     stdout, stderr = p.communicate()
-    stdout = stdout.decode()
+    if not isinstance(stdout, string_types):
+        stdout = stdout.decode()
     return (p.returncode, stdout.strip())
 
 
@@ -103,7 +107,8 @@ def get_sys_net(iface, sys):
     cmd = 'cat /sys/class/net/%s/%s' % (iface, sys)
     p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
     stdout, stderr = p.communicate()
-    stdout = stdout.decode()
+    if not isinstance(stdout, string_types):
+        stdout = stdout.decode()
     return (p.returncode, stdout.strip())
 
 
