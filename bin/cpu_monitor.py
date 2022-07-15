@@ -39,9 +39,7 @@
 ############################################################################
 
 from __future__ import (print_function, with_statement)
-from __future__ import unicode_literals
 
-from builtins import str
 from builtins import object
 
 from six import string_types
@@ -202,7 +200,7 @@ class CPUMonitor(object):
                 return diag_vals, diag_msgs, diag_level
 
             tmp = stdout.strip()
-            if str(tmp).isnumeric():
+            if (u'' + str(tmp)).isnumeric():
                 temp = float(tmp) / 1000
                 diag_vals.append(
                     KeyValue(key='Core %d Temperature' % index, value=str(temp) + "DegC"))

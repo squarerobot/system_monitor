@@ -39,8 +39,7 @@
 ############################################################################
 
 from __future__ import (print_function, with_statement)
-from __future__ import unicode_literals
-from builtins import str
+
 from builtins import range
 from builtins import object
 
@@ -208,10 +207,10 @@ class hdd_monitor(object):
         for index in range(0, len(drives)):
             temp = temps[index]
 
-            if not str(temp).isnumeric() and drives[index] not in REMOVABLE:
+            if not (u'' + str(temp)).isnumeric() and drives[index] not in REMOVABLE:
                 temp_level = DiagnosticStatus.ERROR
                 temp_ok = False
-            elif not str(temp).isnumeric() and drives[index] in REMOVABLE:
+            elif not (u'' + str(temp)).isnumeric() and drives[index] in REMOVABLE:
                 temp_level = DiagnosticStatus.OK
                 temp = "Removed"
             else:
